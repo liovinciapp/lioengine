@@ -24,7 +24,7 @@ func main() {
 	// Sets Bing as our news/updates provider.
 	lioengine.SetProvider("Bing", "API TOKEN")
 
-	// Creates a reader so we can read from the console
+	// Creates a reader so we can read from the console.
 	// Instead of using the os.Stdin we could use a JSON request to get
 	// the project name or get the value from a html form.
 	reader := bufio.NewReader(os.Stdin)
@@ -32,12 +32,13 @@ func main() {
 	// We ask for the project name we want to get updates for.
     fmt.Print("Enter project name: ")
 
-    // Wait until the users press Enter.
+    // Wait until the user press Enter.
     text, _ := reader.ReadString('\n')
 
     // Search for updates.
 	updates, _ := lioengine.FindUpdatesFor(text)
 
+	// Iterates through updates
 	for _, update := range updates {
 		// do whatever with the update info
 	}
