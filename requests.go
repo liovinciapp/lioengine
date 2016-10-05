@@ -6,7 +6,7 @@ import (
 
 // ApiRequest contains all info about the request
 // that will be executed to the api.
-type ApiRequest struct {
+type apiRequest struct {
 	// Url we'll make the request on
 	url string
 	// UrlParameters used on the request.

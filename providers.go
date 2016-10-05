@@ -2,19 +2,18 @@ package lioengine
 
 import (
 	"errors"
-	"github.com/Shixzie/bingprovider"
 )
 
-// Provider is the struct that is used to work with
+// provider is the struct that is used to work with
 // different news providers.
-type Provider struct {
+type provider struct {
 	// Name is the name of the news provider.
 	Name string
 	// Token used to authenticate to the api.
 	Token string
 	// RequestInfo contains everything related to the resquest made
 	// to the api.
-	RequestInfo *ApiRequest
+	RequestInfo *apiRequest
 	// Result is a placeholder for the api results.
 	Result map[string]interface{}
 }
@@ -23,7 +22,7 @@ type Provider struct {
 var providers []string
 
 // currentProvider for news.
-var currentProvider *Provider
+var currentProvider *provider
 
 // SetProvider updates the currentProvider to the new one.
 func SetProvider(newProviderName, apiToken string) (err error) {
@@ -41,7 +40,7 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 }
 
 // getProviderByName returns a provider with the given name.
-func getProviderByName(name, apiToken string) (provider *Provider) {
+func getProviderByName(name, apiToken string) (provider *provider) {
 	switch name {
 	case "Bing":
 		provider = NewBingProvider(apiToken)

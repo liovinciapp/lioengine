@@ -6,7 +6,7 @@ import (
 
 // Adds bing provider support for the bot.
 type Bing struct {
-	Provider
+	provider
 }
 
 // Returns a new initialized bing provider.

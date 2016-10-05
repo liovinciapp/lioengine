@@ -18,6 +18,7 @@ import (
 func main() {
 	lioengine.SetProvider("Bing", "API TOKEN")
 	project, err := lioengine.FindUpdatesFor("iphone 7")
+	// do whatever with the project info
 	...
 }
 ```
