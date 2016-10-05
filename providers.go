@@ -2,7 +2,7 @@ package lioengine
 
 import (
 	"errors"
-	"log"
+	"fmt"
 )
 
 // provider is the struct that is used to work with
@@ -16,66 +16,58 @@ type provider struct {
 	// to the api.
 	RequestInfo *apiRequest
 	// Result is a placeholder for the api results.
-	Result map[interface{}]interface{}
+	Result map[string]interface{}
 }
 
 // providers contains all the providers supported by this bot.
-var providers []string
+var supportedProviders = []string{"Bing"}
 
-// currentProvider for news.
-var currentProvider provider
+// currentProviders for news.
+var currentProviders = make(map[string]provider)
 
-// SetProvider sets the news provider by the name given and
+// AddUpdatesProvider adds the news provider by the name given and
 // initializes it with the corresponding apiToken.
 // This function should be called before FindUpdatesFor().
 // Currently supported providers are: Bing.
-func SetProvider(newProviderName, apiToken string) (err error) {
-	var oldProvider = currentProvider
-	for _, providerName := range providers {
-		if providerName == newProviderName {
-			getProviderByName(providerName, apiToken)
+func AddUpdatesProvider(newProviderName, apiToken string) (err error) {
+	fmt.Println("Enter AddUpdatesProvider")
+	fmt.Println(supportedProviders, "< supportedProviders")
+	fmt.Println(currentProviders, "< currentProviders before adding")
+	fmt.Println(newProviderName, "< the newProviderName")
+	// Iterates through all our supported providers
+	for _, supportedProviderName := range supportedProviders {
+		// Iterates through all currentProviders
+		var alreadyAdded = false
+		for currentProviderName := range currentProviders {
+			if newProviderName == currentProviderName {
+				alreadyAdded = true
+			}
+		}
+		// If is one of our supported providers and we haven't added it yet, then we added.
+		if newProviderName == supportedProviderName && !alreadyAdded {
+			fmt.Println("Gonna add", newProviderName)
+			setupProvider(supportedProviderName, apiToken)
+		} else if supportedProviderName != newProviderName { // If provider not supported.
+			err = errors.New("This provider is not supported by the bot.")
+			return
+		} else { // If provider already added.
+			err = errors.New("This provider is already added.")
+			return
 		}
 	}
-	if oldProvider.Name == currentProvider.Name {
-		err = errors.New("The given provider is not supported.")
+	defer fmt.Println(currentProviders, "< currentProviders after adding")
+	return
+}
+
+func setupProvider(providerName, apiToken string) {
+	switch providerName {
+	case "Bing":
+		bing := &bing{}
+		provider := provider{}
+		bing.setup(apiToken, provider)
+		currentProviders[providerName] = provider
+		fmt.Println("Added provider")
 		return
 	}
-
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("Error ocurred at providers.go - SetProvider(...) ")
-			log.Println(err)
-		}
-	}()
-
 	return
-}
-
-// getProviderByName returns a provider with the given name.
-func getProviderByName(name, apiToken string) {
-	switch name {
-	case "Bing":
-		newBingProvider(apiToken)
-		break
-	default:
-		// You should never ever get here.
-		// For any reason.
-		// Like, NEVER, even if the provider name is worng.
-		break
-	}
-
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("Error ocurred at providers.go - getProviderByName(...) ")
-			log.Println(err)
-		}
-	}()
-
-	return
-}
-
-// setupProviders adds the supported providers to the
-// supported providers list.
-func setupProviders() {
-	providers = append(providers, "Bing")
 }

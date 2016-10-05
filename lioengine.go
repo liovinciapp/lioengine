@@ -8,9 +8,6 @@ import (
 )
 
 func init() {
-	// Creates the defaults for all
-	// supported providers
-	setupProviders()
 }
 
 // Update is the exported struct that contains
@@ -18,13 +15,14 @@ func init() {
 type Update struct {
 	Name          string    `json:"name"`
 	Description   string    `json:"description"`
-	Url           string    `json:"url"`
+	URL           string    `json:"url"`
 	DatePublished time.Time `json:"date_published"`
 	Img           Img       `json:"img"`
 	Category      string    `json:"category"`
 	// Maybe more stuff ...
 }
 
+// Img contains info about the img/thumbnail
 type Img struct {
 	Link   string `json:"link"`
 	Width  int    `json:"width"`
@@ -34,12 +32,12 @@ type Img struct {
 // FindUpdatesFor is the 'main' function for this package. And will return
 // an []*Update for the given project name.
 func FindUpdatesFor(projectName string) (updates []*Update, err error) {
-	err = makeApiCall(projectName)
+	err = makeAPICall(projectName)
 	if err != nil {
 		log.Printf("Error ocurred at lioengine.go - makeApiCall(...) : %s", err.Error())
 		return
 	}
-	log.Println(currentProvider.Result)
+	log.Println(currentProviders)
 	// analizeUpdate()
 	return
 }

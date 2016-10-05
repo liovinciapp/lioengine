@@ -2,64 +2,64 @@ package lioengine
 
 import (
 	"bytes"
-	"log"
+	"net/http"
 )
 
 // Adds bing provider support for the bot.
 type bing struct {
-	p provider
+	provider
 }
 
 // Returns a new initialized bing provider.
-func newBingProvider(apiToken string) {
-	var bing = new(bing)
-	bing.p.Name = "Bing"
-	bing.p.Token = apiToken
-	bing.p.Result = make(map[interface{}]interface{})
-	bing.setupDefaultRequestInfo()
-
-	currentProvider = bing.p
-
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("Error ocurred at bing.go - dunno ")
-			log.Println(err)
-		}
-	}()
+func (bing bing) setup (apiToken string, provider provider) {
+	provider.Name = "Bing"
+	provider.Token = apiToken
+	provider.Result = make(map[string]interface{})
+	provider.RequestInfo = bing.setupDefaultRequestInfo(provider)
+	provider.RequestInfo.Request = bing.setupDefaultHTTPRequest(provider)
+	provider.RequestInfo.urlWithParameters = bing.setupDefaultURLWithParameters(provider.RequestInfo)
+	return
 }
 
-// setupDefaultRequestInfo
-func (b bing) setupDefaultRequestInfo() (newBing *bing) {
-	newBing.p.RequestInfo.url = "https://api.cognitive.microsoft.com/bing/v5.0/news/search?"
-	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
-	newBing.p.RequestInfo.urlParameters = parameters
-	newBing.p.RequestInfo.Quantity = 10 // Fetch first 10 results
-	b.setupDefaultUrlWithParameters(&newBing)
 
-	// This needs to be called the last, so we can use the generated url with parameters.
-	b.setupDefaultHttpRequest()
+// setupDefaultRequestInfo
+func (bing *bing) setupDefaultRequestInfo(prov provider) (reqInfo *apiRequest) {
+	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
+	reqInfo.urlParameters = parameters
+	reqInfo.host = "api.cognitive.microsoft.com"
+	reqInfo.path = "/bing/v5.0/news/search"
+	reqInfo.Quantity = 10 // Fetch first 10 results
+	
 	return
 }
 
 // setupDefaultHttpRequest customizes the http request in order to
 // have a successful call to the api.
-func (bing bing) setupDefaultHttpRequest() {
+func (bing *bing) setupDefaultHTTPRequest(prov provider) (req *http.Request) {
+	
 	// We set the Ocp-Apim-Subscription-Key needed to authenticate to the api.
-	bing.p.RequestInfo.Request.Header.Add("Ocp-Apim-Subscription-Key", bing.p.Token)
+	req.Header.Add("Ocp-Apim-Subscription-Key", prov.Token)
 
 	// We set the request url so when executing makeApiCall(), we use the right url path.
-	bing.p.RequestInfo.Request.URL.Path = bing.p.RequestInfo.urlWithParameters
+	
+	req.URL.Host = prov.RequestInfo.host
+	req.URL.Path = prov.RequestInfo.path
+	return
 }
 
 // setupDefaultUrlWithParameters generates the url with parameters to be used
 // when makeApiCall() calls to the api.
-func (b bing) setupDefaultUrlWithParameters(newBing *bing) {
+func (bing *bing) setupDefaultURLWithParameters(reqInfo *apiRequest) (urlWithParameters string) {
 	var buffer bytes.Buffer
-	buffer.WriteString(newBing.p.RequestInfo.url)
+	buffer.WriteString(reqInfo.host)
+	buffer.WriteString(reqInfo.path)
 	var isLastIteration = false
-	for index, parameter := range newBing.p.RequestInfo.urlParameters {
-		if index == len(newBing.p.RequestInfo.urlParameters)-1 {
+	for index, parameter := range reqInfo.urlParameters {
+		if index == len(reqInfo.urlParameters)-1 {
 			isLastIteration = true
+		}
+		if index == 0 {
+			buffer.WriteString("?")
 		}
 		buffer.WriteString(parameter)
 		buffer.WriteString("=")
@@ -68,5 +68,6 @@ func (b bing) setupDefaultUrlWithParameters(newBing *bing) {
 			buffer.WriteString("&")
 		}
 	}
-	newBing.p.RequestInfo.urlWithParameters = buffer.String()
+	urlWithParameters = buffer.String()
+	return
 }

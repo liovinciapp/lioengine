@@ -12,7 +12,8 @@ import (
 // that will be executed to the api.
 type apiRequest struct {
 	// url we'll make the request on
-	url string
+	host string
+	path string
 	// urlParameters used on the request.
 	urlParameters []string
 	// Request is used to set extra info, such as headers.
@@ -26,9 +27,9 @@ type apiRequest struct {
 
 // makeApiCall connects to the apiServer, and fetch all the results
 // for later ai ml algorithms.
-func makeApiCall(projectName string) (err error) {
+func makeAPICall(projectName string) (err error) {
 	client := new(http.Client)
-	response, err := client.Do(currentProvider.RequestInfo.Request)
+	response, err := client.Do(currentProviders["Bing"].RequestInfo.Request)
 	if err != nil {
 		log.Printf("Error ocurred at requests.go - client.Do(...) : %s", err.Error())
 		return
@@ -40,12 +41,13 @@ func makeApiCall(projectName string) (err error) {
 		log.Printf("Error ocurred at requests.go - ioutil.ReadAll(...) : %s", err.Error())
 		return
 	}
-	if err = json.Unmarshal(data, &currentProvider.Result); err != nil {
+	if err = json.Unmarshal(data, currentProviders["Bing"].Result); err != nil {
 		log.Printf("Error ocurred at requests.go - json.Unmarshal(...) : %s", err.Error())
 		return
 	}
 	return
 }
+
 
 // replaceSpaces replaces spaces of text with char if the text contains
 // spaces.

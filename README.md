@@ -1,7 +1,7 @@
 [![Visual Studio Team services](https://img.shields.io/vso/build/larsbrinkhoff/953a34b9-5966-4923-a48a-c41874cfb5f5/1.svg?maxAge=2592000)]()
 
 # lioengine
-liovinci's machine learning ai that finds updates for projects
+liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
 
 ## Supported providers
 
@@ -26,7 +26,7 @@ import (
 func main() {
 	
 	// Sets Bing as our news/updates provider.
-	lioengine.SetProvider("Bing", "API TOKEN")
+	lioengine.AddUpdatesProvider("Bing", "API TOKEN")
 
 	// Creates a reader so we can read from the console.
 	// Instead of using the os.Stdin we could use a JSON request to get
