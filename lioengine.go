@@ -16,27 +16,28 @@ func init() {
 	setupProviders()
 }
 
-// Project is the exported struct that contains
+// Update is the exported struct that contains
 // all kind of info about the project.
-type Project struct {
+type Update struct {
 	Name          string    `json:"name"`
 	Description   string    `json:"description"`
 	Url           string    `json:"url"`
 	DatePublished time.Time `json:"date_published"`
-	Img           img       `json:"img"`
+	Img           Img       `json:"img"`
 	Category      string    `json:"category"`
 	Source        source    `json:"source"`
 	// Maybe more stuff ...
 }
 
-type img struct {
+type Img struct {
 	Link   string `json:"link"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 }
 
-// FindUpdatesFor is the 'main' function this package will have.
-func FindUpdatesFor(projectName string) (project *Project, err error) {
+// FindUpdatesFor is the 'main' function for this package. And will return
+// an []*Update for the given project name.
+func FindUpdatesFor(projectName string) (updates *Update, err error) {
 	return
 }
 

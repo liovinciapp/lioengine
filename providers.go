@@ -24,7 +24,9 @@ var providers []string
 // currentProvider for news.
 var currentProvider *provider
 
-// SetProvider updates the currentProvider to the new one.
+// SetProvider sets the news provider by the name given and
+// initializes it with the corresponding apiToken.
+// This function should be called before FindUpdatesFor().
 func SetProvider(newProviderName, apiToken string) (err error) {
 	var oldProvider = currentProvider
 	for _, providerName := range providers {
@@ -43,7 +45,7 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 func getProviderByName(name, apiToken string) (provider *provider) {
 	switch name {
 	case "Bing":
-		provider = NewBingProvider(apiToken)
+		provider = newBingProvider(apiToken)
 		break
 	}
 	return

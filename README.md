@@ -14,13 +14,33 @@ package main
 
 import (
 	"github.com/Shixzie/lioengine"
+	"bufio"
 	"os"
+	"fmt"
 )
 
 func main() {
+	
+	// Sets Bing as our news/updates provider.
 	lioengine.SetProvider("Bing", "API TOKEN")
-	project, err := lioengine.FindUpdatesFor("iphone 7")
-	// do whatever with the project info
+
+	// Creates a reader so we can read from the console
+	// Instead of using the os.Stdin we could use a JSON request to get
+	// the project name or get the value from a html form.
+	reader := bufio.NewReader(os.Stdin)
+
+	// We ask for the project name we want to get updates for.
+    fmt.Print("Enter project name: ")
+
+    // Wait until the users press Enter.
+    text, _ := reader.ReadString('\n')
+
+    // Search for updates.
+	updates, _ := lioengine.FindUpdatesFor(text)
+
+	for _, update := range updates {
+		// do whatever with the update info
+	}
 	...
 }
 ```
