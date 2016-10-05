@@ -11,7 +11,8 @@ import (
 )
 
 func init() {
-	// Add all providers supported by this bot.
+	// Creates the defaults for all
+	// supported providers
 	setupProviders()
 }
 
@@ -26,6 +27,12 @@ type Project struct {
 	Category      string    `json:"category"`
 	Source        source    `json:"source"`
 	// Maybe more stuff ...
+}
+
+type img struct {
+	Link   string `json:"link"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 }
 
 // FindUpdatesFor is the 'main' function this package will have.
