@@ -1,7 +1,7 @@
 package bing
 
 import (
-	"github.com/Shixzie/lioengine"
+	"../lioengine"
 	"net/http"
 )
 
