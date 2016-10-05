@@ -9,7 +9,7 @@ go get github.com/Shixzie/lioengine
 ```
 
 ## Usage
-[code language="go"]
+```go
 package main
 
 import (
@@ -44,4 +44,4 @@ func main() {
 	}
 	...
 }
-[/code]
+```
