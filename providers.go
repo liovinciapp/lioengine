@@ -2,6 +2,7 @@ package lioengine
 
 import (
 	"errors"
+	"log"
 )
 
 // provider is the struct that is used to work with
@@ -15,14 +16,14 @@ type provider struct {
 	// to the api.
 	RequestInfo *apiRequest
 	// Result is a placeholder for the api results.
-	Result map[string]interface{}
+	Result map[interface{}]interface{}
 }
 
 // providers contains all the providers supported by this bot.
 var providers []string
 
 // currentProvider for news.
-var currentProvider *provider
+var currentProvider provider
 
 // SetProvider sets the news provider by the name given and
 // initializes it with the corresponding apiToken.
@@ -32,22 +33,29 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 	var oldProvider = currentProvider
 	for _, providerName := range providers {
 		if providerName == newProviderName {
-			getProviderByName(providerName, apiToken, currentProvider)
+			getProviderByName(providerName, apiToken)
 		}
 	}
-	if oldProvider == currentProvider {
+	if oldProvider.Name == currentProvider.Name {
 		err = errors.New("The given provider is not supported.")
 		return
 	}
+
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Error ocurred at providers.go - SetProvider(...) ")
+			log.Println(err)
+		}
+	}()
+
 	return
 }
 
 // getProviderByName returns a provider with the given name.
-func getProviderByName(name, apiToken string, providerTarget *provider) {
+func getProviderByName(name, apiToken string) {
 	switch name {
 	case "Bing":
-		bing := newBingProvider(apiToken)
-		providerTarget = bing
+		newBingProvider(apiToken)
 		break
 	default:
 		// You should never ever get here.
@@ -55,6 +63,14 @@ func getProviderByName(name, apiToken string, providerTarget *provider) {
 		// Like, NEVER, even if the provider name is worng.
 		break
 	}
+
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Error ocurred at providers.go - getProviderByName(...) ")
+			log.Println(err)
+		}
+	}()
+
 	return
 }
 
