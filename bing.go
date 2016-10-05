@@ -9,26 +9,28 @@ type Bing struct {
 	Provider
 }
 
+// Returns a new initialized bing provider.
 func NewBingProvider(apiToken string) (bing *Bing) {
+	bing.Name = "Bing"
 	bing.Token = apiToken
+	bing.setupDefaultRequestInfo()
 	return
 }
 
-func (p *Bing) Setup() (provider Provider) {
-	p.Name = "Bing"
-	p.RequestInfo = p.setupDefaultRequestInfo()
-	return
-}
-
-func (p *Bing) setupDefaultRequestInfo() (requestInfo ApiRequest) {
-	requestInfo.url = "https://api.cognitive.microsoft.com/bing/v5.0/news/search?"
+func (p *Bing) setupDefaultRequestInfo() {
+	p.RequestInfo.url = "https://api.cognitive.microsoft.com/bing/v5.0/news/search?"
 	parameters := []string{"q", "count"}
-	requestInfo.urlParameters = parameters
-	requestInfo.Request = setupDefaultHttpRequest()
+	p.RequestInfo.urlParameters = parameters
+	p.RequestInfo.Request = p.setupDefaultHttpRequest()
+	p.RequestInfo.urlWithParameters = p.setupDefaultUrlWithParameters()
 	return
 }
 
 func (p *Bing) setupDefaultHttpRequest() (request *http.Request) {
 	request.Header.Add("Ocp-Apim-Subscription-Key", p.Token)
 	return
+}
+
+func (p *Bing) setupDefaultUrlWithParameters() {
+
 }

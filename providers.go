@@ -40,12 +40,6 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 	return
 }
 
-// SetProviderToken sets the token for the provider specified with
-// SetProvider(). This needs to be called
-func SetProviderToken(token string) {
-	currentProvider.RequestInfo.Token = token
-}
-
 // getProviderByName returns a provider with the given name.
 func getProviderByName(name, apiToken string) (provider *Provider) {
 	switch name {
