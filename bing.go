@@ -6,7 +6,7 @@ import (
 
 // Adds bing provider support for the bot.
 type bing struct {
-	p provider
+	p *provider
 }
 
 // Returns a new initialized bing provider.
@@ -15,7 +15,7 @@ func newBingProvider(apiToken string) (bingProvider *provider) {
 	bing.p.Name = "Bing"
 	bing.p.Token = apiToken
 	bing.setupDefaultRequestInfo()
-	return &bing.p
+	return bing.p
 }
 
 // setupDefaultRequestInfo
