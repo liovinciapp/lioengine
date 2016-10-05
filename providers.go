@@ -50,6 +50,8 @@ func getProviderByName(name, apiToken string) (provider *provider) {
 		break
 	default:
 		// You should never ever get here.
+		// For any reason.
+		// Like, NEVER, even if the provider name is worng.
 		break
 	}
 	return
