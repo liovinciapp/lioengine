@@ -3,10 +3,7 @@
 package lioengine
 
 import (
-	"encoding/json"
 	"log"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -25,7 +22,6 @@ type Update struct {
 	DatePublished time.Time `json:"date_published"`
 	Img           Img       `json:"img"`
 	Category      string    `json:"category"`
-	Source        source    `json:"source"`
 	// Maybe more stuff ...
 }
 
@@ -37,22 +33,13 @@ type Img struct {
 
 // FindUpdatesFor is the 'main' function for this package. And will return
 // an []*Update for the given project name.
-func FindUpdatesFor(projectName string) (updates *Update, err error) {
-	return
-}
-
-// makeApiCall connects to the apiServer, and fetch all the results
-// for later ai ml algorithms.
-func makeApiCall(projectName string) (results []*result, httpStatus int, err error) {
-	return
-}
-
-// replaceSpaces replaces spaces of text with char if the text contains
-// spaces.
-func replaceSpaces(text, char string) (newText string) {
-	if strings.Contains(text, " ") {
-		newText = strings.Replace(text, " ", char, 0)
+func FindUpdatesFor(projectName string) (updates []*Update, err error) {
+	err = makeApiCall(projectName)
+	if err != nil {
+		log.Printf("Error ocurred at lioengine.go - makeApiCall(...) : %s", err.Error())
 		return
 	}
-	return text
+	log.Println(currentProvider.Result)
+	// analizeUpdate()
+	return
 }

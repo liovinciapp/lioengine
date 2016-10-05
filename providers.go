@@ -27,6 +27,7 @@ var currentProvider *provider
 // SetProvider sets the news provider by the name given and
 // initializes it with the corresponding apiToken.
 // This function should be called before FindUpdatesFor().
+// Currently supported providers are: Bing.
 func SetProvider(newProviderName, apiToken string) (err error) {
 	var oldProvider = currentProvider
 	for _, providerName := range providers {
@@ -46,6 +47,9 @@ func getProviderByName(name, apiToken string) (provider *provider) {
 	switch name {
 	case "Bing":
 		provider = newBingProvider(apiToken)
+		break
+	default:
+		// You should never ever get here.
 		break
 	}
 	return

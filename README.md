@@ -3,6 +3,10 @@
 # lioengine
 liovinci's machine learning ai that finds updates for projects
 
+## Supported providers
+
+1. Bing
+
 ## Installation
 ```
 go get github.com/Shixzie/lioengine
@@ -33,10 +37,10 @@ func main() {
     fmt.Print("Enter project name: ")
 
     // Wait until the user press Enter.
-    text, _ := reader.ReadString('\n')
+    project, _ := reader.ReadString('\n')
 
     // Search for updates.
-	updates, _ := lioengine.FindUpdatesFor(text)
+	updates, _ := lioengine.FindUpdatesFor(project)
 
 	// Iterates through updates
 	for _, update := range updates {
