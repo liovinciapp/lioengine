@@ -10,12 +10,12 @@ type bing struct {
 }
 
 // Returns a new initialized bing provider.
-func newBingProvider(apiToken string) (bingProvider provider) {
+func newBingProvider(apiToken string) (bingProvider *provider) {
 	var bing *bing
 	bing.p.Name = "Bing"
 	bing.p.Token = apiToken
 	bing.setupDefaultRequestInfo()
-	return bing.p
+	return &bing.p
 }
 
 // setupDefaultRequestInfo
