@@ -27,7 +27,7 @@ type apiRequest struct {
 // makeApiCall connects to the apiServer, and fetch all the results
 // for later ai ml algorithms.
 func makeApiCall(projectName string) (err error) {
-	client := &http.Client{}
+	client := new(http.Client)
 	response, err := client.Do(currentProvider.RequestInfo.Request)
 	if err != nil {
 		log.Printf("Error ocurred at requests.go - client.Do(...) : %s", err.Error())

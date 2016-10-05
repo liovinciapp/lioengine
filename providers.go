@@ -32,7 +32,7 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 	var oldProvider = currentProvider
 	for _, providerName := range providers {
 		if providerName == newProviderName {
-			currentProvider = getProviderByName(providerName, apiToken)
+			getProviderByName(providerName, apiToken, currentProvider)
 		}
 	}
 	if oldProvider == currentProvider {
@@ -43,10 +43,11 @@ func SetProvider(newProviderName, apiToken string) (err error) {
 }
 
 // getProviderByName returns a provider with the given name.
-func getProviderByName(name, apiToken string) (provider *provider) {
+func getProviderByName(name, apiToken string, providerTarget *provider) {
 	switch name {
 	case "Bing":
-		provider = newBingProvider(apiToken)
+		bing := newBingProvider(apiToken)
+		providerTarget = bing
 		break
 	default:
 		// You should never ever get here.
