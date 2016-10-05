@@ -10,11 +10,12 @@ type bing struct {
 }
 
 // Returns a new initialized bing provider.
-func newBingProvider(apiToken string) (bing *bing) {
+func newBingProvider(apiToken string) (bingProvider provider) {
+	var bing *bing
 	bing.p.Name = "Bing"
 	bing.p.Token = apiToken
 	bing.setupDefaultRequestInfo()
-	return
+	return bing.p
 }
 
 // setupDefaultRequestInfo
@@ -34,10 +35,10 @@ func (bing *bing) setupDefaultRequestInfo() {
 // have a successful call to the api.
 func (bing *bing) setupDefaultHttpRequest() {
 	// We set the Ocp-Apim-Subscription-Key needed to authenticate to the api.
-	bing.p.RequestInfo.Request.Header.Add("Ocp-Apim-Subscription-Key", provider.Token)
+	bing.p.RequestInfo.Request.Header.Add("Ocp-Apim-Subscription-Key", bing.p.Token)
 
 	// We set the request url so when executing makeApiCall(), we use the right url path.
-	bing.p.RequestInfo.Request.URL.Path = provider.RequestInfo.urlWithParameters
+	bing.p.RequestInfo.Request.URL.Path = bing.p.RequestInfo.urlWithParameters
 }
 
 // setupDefaultUrlWithParameters generates the url with parameters to be used
