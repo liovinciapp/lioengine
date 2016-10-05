@@ -14,6 +14,7 @@ func newBingProvider(apiToken string) (bingProvider *provider) {
 	var bing *bing
 	bing.p.Name = "Bing"
 	bing.p.Token = apiToken
+	bing.p.Result = make(map[string]interface{})
 	bing.setupDefaultRequestInfo()
 	return bing.p
 }
