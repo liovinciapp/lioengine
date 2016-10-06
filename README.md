@@ -3,6 +3,9 @@
 # lioengine
 liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
 
+## Status
+Right now i'm working on setting up a nice and wide base so i can add any update provider in the future whitout having to change the api later. After i finish creating a solid base, i'll start writing the algorithms that will actually make this and Ai Ml Bot.
+
 ## Supported providers
 
 1. Bing
@@ -50,5 +53,5 @@ func main() {
 }
 ```
 
-##Documentation
+## Documentation
 [Godoc:](http://godoc.org/github.com/Shixzie/lioengine)
