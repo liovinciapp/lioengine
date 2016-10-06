@@ -2,7 +2,6 @@ package lioengine
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
@@ -25,7 +24,12 @@ func (b bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
 	prov.Result = make(map[string]interface{})
 	prov.Type = bing{}
 
+	// Sets a non nil value to RequestInfo
 	prov.RequestInfo = new(apiRequest)
+
+	// Sets a non nil value to RequestInfo.Request
+	prov.RequestInfo.Request, _ = http.NewRequest("GET", "", nil)
+
 	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
 	prov.RequestInfo.urlParameters = parameters
 	prov.RequestInfo.host = "https://api.cognitive.microsoft.com"
@@ -40,11 +44,6 @@ func (b bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
 // setupDefaultHttpRequest customizes the http request in order to
 // have a successful call to the api.
 func (b bing) setupDefaultHTTPRequest(apiToken, host, path string, req *http.Request) {
-	// Sets a non nil value to req
-	req, err := http.NewRequest("GET", "", nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	// We set the Ocp-Apim-Subscription-Key needed to authenticate to the api.
 	req.Header.Add("Ocp-Apim-Subscription-Key", apiToken)
 
