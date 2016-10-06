@@ -3,6 +3,7 @@
 package lioengine
 
 import (
+	"log"
 	"time"
 )
 
@@ -31,12 +32,11 @@ type Img struct {
 // FindUpdatesFor is the 'main' function for this package. And will return
 // an []*Update for the given project name.
 func FindUpdatesFor(projectName string) (updates []*Update, err error) {
-	// err = makeAPICall(projectName)
-	// if err != nil {
-	// 	log.Printf("Error ocurred at lioengine.go - makeApiCall(...) : %s", err.Error())
-	// 	return
-	// }
-	// log.Println(currentProviders)
+	err = makeAPICall(projectName)
+	if err != nil {
+		log.Printf("Error ocurred at lioengine.go - makeApiCall(...) : %s", err.Error())
+		return
+	}
 	// analizeUpdate()
 	return
 }

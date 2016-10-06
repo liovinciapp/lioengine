@@ -73,3 +73,14 @@ func setupProvider(providerName, apiToken string) {
 	}
 	return
 }
+
+// Returns the slide index for the provider with the name
+// providerName.
+func getProviderIndexByName(providerName string) (index int) {
+	for index, currentProvider := range currentProviders {
+		if currentProvider.Name == providerName {
+			return index
+		}
+	}
+	return
+}
