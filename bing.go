@@ -5,38 +5,41 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 // Adds bing provider support for the bot.
 type bing struct{}
 
 // Returns a new initialized bing provider.
-func (bing bing) setup(apiToken string) (prov provider) {
-	prov = bing.setupDefaultRequestInfo(apiToken)
+func (b bing) setup(apiToken string) (prov provider) {
+	prov = b.setupDefaultRequestInfo(apiToken)
 	return
 }
 
 // setupDefaultRequestInfo
-func (bing bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
+func (b bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
 
 	prov.Name = "Bing"
 	prov.Token = apiToken
 	prov.Result = make(map[string]interface{})
+	prov.Type = bing{}
 
+	prov.RequestInfo = new(apiRequest)
 	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
 	prov.RequestInfo.urlParameters = parameters
 	prov.RequestInfo.host = "https://api.cognitive.microsoft.com"
 	prov.RequestInfo.path = "/bing/v5.0/news/search"
 	prov.RequestInfo.Quantity = 10 // Fetch first 10 results
-	prov.RequestInfo.urlWithParameters = bing.setupDefaultURLWithParameters(prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.urlParameters)
-	bing.setupDefaultHTTPRequest(apiToken, prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.Request)
+	prov.RequestInfo.urlWithParameters = b.setupDefaultURLWithParameters(prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.urlParameters)
+	b.setupDefaultHTTPRequest(apiToken, prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.Request)
 
 	return
 }
 
 // setupDefaultHttpRequest customizes the http request in order to
 // have a successful call to the api.
-func (bing bing) setupDefaultHTTPRequest(apiToken, host, path string, req *http.Request) {
+func (b bing) setupDefaultHTTPRequest(apiToken, host, path string, req *http.Request) {
 	// Sets a non nil value to req
 	req, err := http.NewRequest("GET", "", nil)
 	if err != nil {
@@ -57,7 +60,7 @@ func (bing bing) setupDefaultHTTPRequest(apiToken, host, path string, req *http.
 
 // setupDefaultUrlWithParameters generates the url with parameters to be used
 // when makeApiCall() calls to the api.
-func (bing bing) setupDefaultURLWithParameters(host, path string, urlParameters []string) (urlWithParameters string) {
+func (b bing) setupDefaultURLWithParameters(host, path string, urlParameters []string) (urlWithParameters string) {
 	var buffer bytes.Buffer
 	buffer.WriteString(host)
 	buffer.WriteString(path)
@@ -78,4 +81,9 @@ func (bing bing) setupDefaultURLWithParameters(host, path string, urlParameters 
 	}
 	urlWithParameters = buffer.String()
 	return
+}
+
+// search calls to the provider api and fetch results
+func (b bing) search(prov *provider, wg *sync.WaitGroup) {
+	wg.Done()
 }
