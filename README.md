@@ -69,15 +69,15 @@ func main() {
 	updates3, _ := bot3.FindUpdatesFor(project)
 
 	// Iterates through updates
-	for _, update1 := range updates {
+	for _, update := range updates1 {
 		// do whatever with the update info
 	}
 
-	for _, update2 := range updates {
+	for _, update := range updates2 {
 		// ...
 	}
 
-	for _, update3 := range updates {
+	for _, update := range updates3 {
 		// ...
 	}
 	...
