@@ -29,7 +29,7 @@ type apiRequest struct {
 // for later ai ml algorithms.
 func makeAPICall(projectName string) (err error) {
 	client := new(http.Client)
-	response, err := client.Do(currentProviders["Bing"].RequestInfo.Request)
+	response, err := client.Do(currentProviders[0].RequestInfo.Request)
 	if err != nil {
 		log.Printf("Error ocurred at requests.go - client.Do(...) : %s", err.Error())
 		return
@@ -41,7 +41,7 @@ func makeAPICall(projectName string) (err error) {
 		log.Printf("Error ocurred at requests.go - ioutil.ReadAll(...) : %s", err.Error())
 		return
 	}
-	if err = json.Unmarshal(data, currentProviders["Bing"].Result); err != nil {
+	if err = json.Unmarshal(data, &currentProviders[0].Result); err != nil {
 		log.Printf("Error ocurred at requests.go - json.Unmarshal(...) : %s", err.Error())
 		return
 	}
