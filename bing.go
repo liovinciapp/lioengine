@@ -25,7 +25,7 @@ func (bing bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
 
 	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
 	prov.RequestInfo.urlParameters = parameters
-	prov.RequestInfo.host = "api.cognitive.microsoft.com"
+	prov.RequestInfo.host = "https://api.cognitive.microsoft.com"
 	prov.RequestInfo.path = "/bing/v5.0/news/search"
 	prov.RequestInfo.Quantity = 10 // Fetch first 10 results
 	prov.RequestInfo.urlWithParameters = bing.setupDefaultURLWithParameters(prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.urlParameters)

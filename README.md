@@ -1,4 +1,4 @@
-[![Visual Studio Team services](https://img.shields.io/vso/build/larsbrinkhoff/953a34b9-5966-4923-a48a-c41874cfb5f5/1.svg?maxAge=2592000)]()
+[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg?maxAge=2592000)]()  [![AUR](https://img.shields.io/aur/license/yaourt.svg?maxAge=2592000)]() [![Waffle.io](https://img.shields.io/waffle/label/evancohen/smart-mirror/in%20progress.svg?maxAge=2592000)]()
 
 # lioengine
 liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
@@ -49,3 +49,6 @@ func main() {
 	...
 }
 ```
+
+##Documentation
+[Godoc:](http://godoc.org/github.com/Shixzie/lioengine)

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"fmt"
 )
 
 // apiRequest contains all info about the request
@@ -36,13 +37,18 @@ func makeAPICall(projectName string) (err error) {
 		go func() {
 			if provider.RequestInfo.Request == nil {
 				log.Println("Nil request on makeAPICall")
-				provider.RequestInfo.Request, err = http.NewRequest("GET", parseURL(provider.RequestInfo.urlWithParameters, provider.RequestInfo.urlParameters), nil)
+				provider.RequestInfo.Request, err = http.NewRequest("", parseURL(provider.RequestInfo.urlWithParameters, projectName, provider.RequestInfo.Quantity), nil)
+				if err != nil {
+					log.Printf("Error ocurred at requests.go - http.NewRequest(...) : %s", err.Error())
+					wg.Done()
+					return
+				}
 			}
 
-			client := new(http.Client)
-			response, err := client.Do(provider.RequestInfo.Request)
+			response, err := http.DefaultClient.Do(provider.RequestInfo.Request)
 			if err != nil {
 				log.Printf("Error ocurred at requests.go - client.Do(...) : %s", err.Error())
+				wg.Done()
 				return
 			}
 			defer response.Body.Close()
@@ -50,6 +56,7 @@ func makeAPICall(projectName string) (err error) {
 			data, err := ioutil.ReadAll(response.Body)
 			if err != nil {
 				log.Printf("Error ocurred at requests.go - ioutil.ReadAll(...) : %s", err.Error())
+				wg.Done()
 				return
 			}
 
@@ -60,6 +67,7 @@ func makeAPICall(projectName string) (err error) {
 
 			if err = json.Unmarshal(data, &provider.Result); err != nil {
 				log.Printf("Error ocurred at requests.go - json.Unmarshal(...) : %s", err.Error())
+				wg.Done()
 				return
 			}
 			
@@ -73,16 +81,17 @@ func makeAPICall(projectName string) (err error) {
 }
 
 // parseURL puts the parameters on the url
-func parseURL(urlWithParameters string, parameters []string) (parsedURL string) {
-
-	return
+func parseURL(urlWithParameters, projectName string, count int) (parsedURL string) {
+	noSpacedProjectName := replaceSpaces(projectName, "+")
+	parsedURL = fmt.Sprintf(urlWithParameters, noSpacedProjectName, count)
+	return 
 }
 
 // replaceSpaces replaces spaces of text with char if the text contains
 // spaces.
 func replaceSpaces(text, char string) (newText string) {
 	if strings.Contains(text, " ") {
-		newText = strings.Replace(text, " ", char, 0)
+		newText = strings.Replace(text, " ", char, -1)
 		return
 	}
 	return text
