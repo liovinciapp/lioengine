@@ -3,20 +3,19 @@ package lioengine
 import (
 	"errors"
 	"log"
-	"net/http"
 	"sync"
 )
-
-// Bot holds all utility for searching news and updates
-type Bot struct {
-	currentProviders []*provider
-}
 
 // NewBot creates a bot.
 func NewBot() (bot *Bot) {
 	bot = new(Bot)
 	bot.currentProviders = []*provider{}
 	return
+}
+
+// Bot holds all utility for searching news and updates
+type Bot struct {
+	currentProviders []*provider
 }
 
 // FindUpdatesFor is the 'main' function for this package. And will return
@@ -27,7 +26,7 @@ func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) 
 		log.Printf("Error ocurred at lioengine.go - makeApiCalls(...) : %s", err.Error())
 		return
 	}
-	//updates, err = analizeUpdates()
+	//updates, err = b.analizeUpdates()
 	// if err != nil {
 	// 	log.Printf("Error ocurred at lioengine.go - analizeUpdates(...) : %s", err.Error())
 	// 	return
@@ -38,25 +37,49 @@ func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) 
 // makeApiCalls connects to the apiServer, and fetch all the results
 // for later ai ml algorithms.
 func (b *Bot) makeAPICalls(projectName string) (err error) {
+	// wg waits for all concurrent searches to finish
+	// and blocks this func until all of the searches are done.
 	var wg = new(sync.WaitGroup)
 	for _, provider := range b.currentProviders {
-		if provider.RequestInfo.Request == nil {
-			log.Println("Nil request on makeAPICall")
-			provider.RequestInfo.Request, err = http.NewRequest("", parseURL(provider.RequestInfo.urlWithParameters, projectName, provider.RequestInfo.Quantity), nil)
-			if err != nil {
-				log.Printf("Error ocurred at requests.go - http.NewRequest(...) : %s", err.Error())
-				return
-			}
-		}
-
+		wg.Add(1)
 		switch v := provider.Type.(type) {
-		case bing:
-			wg.Add(1)
-			go v.search(provider, wg)
+		case bingProv:
+			go v.search(projectName, provider, wg)
 			break
+		case twitterProv:
+			go v.search(projectName, provider, wg)
+			break 
 		}
 	}
 	wg.Wait()
+	return
+}
+
+// setupProvider generates a provider corresponding to it's name
+func (b *Bot) setupProvider(providerName, apiToken string) {
+	switch providerName {
+	case "Bing":
+		bing := bingProv{}
+		provider := bing.setup(apiToken)
+		b.currentProviders = append(b.currentProviders, provider)
+		break
+	case "Twitter":
+		twitter := twitterProv{}
+		provider := twitter.setup(apiToken)
+		b.currentProviders = append(b.currentProviders, provider)
+		break
+	}
+	return
+}
+
+// Returns the slide index for the provider with the name
+// providerName.
+func (b *Bot) getProviderIndexByName(providerName string) (index int) {
+	for index, currentProvider := range b.currentProviders {
+		if currentProvider.Name == providerName {
+			return index
+		}
+	}
 	return
 }
 
@@ -66,7 +89,7 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 // This is also designed to be called multiple times.
 // Current supported providers are: Bing.
 func AddUpdatesProvider(newProviderName, apiToken string, bots ...*Bot) (err error) {
-    //Iterates through all bots to add the providers
+	//Iterates through all bots to add the providers
 	for _, bot := range bots {
 		var alreadyAdded = false
 		// Iterates through all currentProviders
@@ -97,29 +120,6 @@ func AddUpdatesProvider(newProviderName, apiToken string, bots ...*Bot) (err err
 		} else { // If provider not supported.
 			err = errors.New("This provider is not supported by the bot.")
 			return
-		}
-	}
-	return
-}
-
-// setupProvider generates a provider corresponding to it's name
-func (b *Bot) setupProvider(providerName, apiToken string) {
-	switch providerName {
-	case "Bing":
-		bing := bing{}
-		provider := bing.setup(apiToken)
-		b.currentProviders = append(b.currentProviders, &provider)
-		return
-	}
-	return
-}
-
-// Returns the slide index for the provider with the name
-// providerName.
-func (b *Bot) getProviderIndexByName(providerName string) (index int) {
-	for index, currentProvider := range b.currentProviders {
-		if currentProvider.Name == providerName {
-			return index
 		}
 	}
 	return

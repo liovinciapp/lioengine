@@ -5,84 +5,119 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"io/ioutil"
+	"log"
+	"encoding/json"
 )
 
 // Adds bing provider support for the bot.
-type bing struct{}
+// this is just a wraping struct.
+type bingProv struct{}
 
-// Returns a new initialized bing provider.
-func (b bing) setup(apiToken string) (prov provider) {
-	prov = b.setupDefaultRequestInfo(apiToken)
+// setup returns a new initialized bing provider.
+func (b bingProv) setup(apiToken string) (prov *provider) {
+	prov = b.newProvider(apiToken)
 	return
 }
 
-// setupDefaultRequestInfo
-func (b bing) setupDefaultRequestInfo(apiToken string) (prov provider) {
-
+// newProvider creates a ready to use bing provider.
+func (b bingProv) newProvider(apiToken string) (prov *provider) {
+	prov = &provider{}
 	prov.Name = "Bing"
 	prov.Token = apiToken
 	prov.Result = make(map[string]interface{})
-	prov.Type = bing{}
+	prov.Type = bingProv{}
 
 	// Sets a non nil value to RequestInfo
 	prov.RequestInfo = new(apiRequest)
 
-	// Sets a non nil value to RequestInfo.Request
-	prov.RequestInfo.Request, _ = http.NewRequest("GET", "", nil)
+	// Sets a non nil value to RequestInfo.Request, the http method defaults to GET
+	prov.RequestInfo.Request, _ = http.NewRequest("", "https://api.cognitive.microsoft.com/bing/v5.0/news/search", nil)
 
-	parameters := []string{"q", "count"} // Maybe in the future the user could choose what parameters use.
-	prov.RequestInfo.urlParameters = parameters
-	prov.RequestInfo.host = "https://api.cognitive.microsoft.com"
-	prov.RequestInfo.path = "/bing/v5.0/news/search"
+	keys := []string{ // Maybe in the future the user could choose what keys use.
+		"q",
+		"count",
+	} 
+	prov.RequestInfo.urlKeys = keys
 	prov.RequestInfo.Quantity = 10 // Fetch first 10 results
-	prov.RequestInfo.urlWithParameters = b.setupDefaultURLWithParameters(prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.urlParameters)
-	b.setupDefaultHTTPRequest(apiToken, prov.RequestInfo.host, prov.RequestInfo.path, prov.RequestInfo.Request)
+	b.setupDefaultHTTPRequest(apiToken, prov.RequestInfo.Request)
 
 	return
 }
 
 // setupDefaultHttpRequest customizes the http request in order to
 // have a successful call to the api.
-func (b bing) setupDefaultHTTPRequest(apiToken, host, path string, req *http.Request) {
+func (b bingProv) setupDefaultHTTPRequest(apiToken string, req *http.Request) {
 	// We set the Ocp-Apim-Subscription-Key needed to authenticate to the api.
 	req.Header.Add("Ocp-Apim-Subscription-Key", apiToken)
 
-	// Sets a non nil value to req.URL
-	req.URL = new(url.URL)
-
-	// We set the request url so when executing makeApiCall(), we use the right url path.
-	req.URL.Host = host
-	req.URL.Path = path
-
+	// Sets protocol
+	req.Proto = "HTTP/1.1"
+	// Sets scheme
+	req.URL.Scheme = "https"
+	// Sets host
+	req.Host = "api.cognitive.microsoft.com"
 	return
 }
 
 // setupDefaultUrlWithParameters generates the url with parameters to be used
 // when makeApiCall() calls to the api.
-func (b bing) setupDefaultURLWithParameters(host, path string, urlParameters []string) (urlWithParameters string) {
+func (b bingProv) addParamsToURL(urlKeys []string, urlValues []string, url *url.URL) {
 	var buffer bytes.Buffer
-	buffer.WriteString(host)
-	buffer.WriteString(path)
 	var isLastIteration = false
-	for index, parameter := range urlParameters {
-		if index == len(urlParameters)-1 {
+	for index, key := range urlKeys {
+		if index == len(urlKeys)-1 {
 			isLastIteration = true
 		}
-		if index == 0 {
-			buffer.WriteString("?")
-		}
-		buffer.WriteString(parameter)
+		buffer.WriteString(key)
 		buffer.WriteString("=")
-		buffer.WriteString("%v")
+		buffer.WriteString(urlValues[index])
 		if !isLastIteration {
 			buffer.WriteString("&")
 		}
 	}
-	urlWithParameters = buffer.String()
-	return
+	url.RawQuery = buffer.String()
 }
 
-// search calls to the provider api and fetch results
-func (b bing) search(prov *provider, wg *sync.WaitGroup) {
+// search calls to the provider api and fetch results into
+// prov.Result
+func (b bingProv) search(projectName string, prov *provider, wg *sync.WaitGroup) {
+	var err error
+	nonSpacedProjectName := replaceSpaces(projectName, "+")
+	urlValues := []string {
+		nonSpacedProjectName,
+		prov.RequestInfo.Quantity.String(),
+	}
+	b.addParamsToURL(prov.RequestInfo.urlKeys, urlValues, prov.RequestInfo.Request.URL)
+	// prov.RequestInfo.Request, err = http.NewRequest("", "https://api.cognitive.microsoft.com/bing/v5.0/news/search?q=iphone+7&count=10", nil)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// 	wg.Done()
+	// 	return
+	// }
+	//prov.RequestInfo.Request.Header.Add("Ocp-Apim-Subscription-Key", apiToken)
+	resp, err := http.DefaultClient.Do(prov.RequestInfo.Request)
+	if err != nil {
+		log.Println("Client.Do", err.Error())
+		wg.Done()
+		return
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("ReadAll", err.Error())
+		wg.Done()
+		return
+	}
+	log.Println(resp)
+	log.Println("")
+	log.Println(string(data))
+	err = json.Unmarshal(data, &prov.Result)
+	if err != nil {
+		log.Println("Unmarshal", err.Error())
+		wg.Done()
+		return
+	}
+	log.Println(prov.Result)
 	wg.Done()
 }
