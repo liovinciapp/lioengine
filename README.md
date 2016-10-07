@@ -8,8 +8,8 @@ Right now i'm working on setting up a nice and wide base so i can add any update
 
 TLDR: **Still on development. Can be built and executed, but wont work.**
 
-## How it works
-![Workflow](https://puu.sh/rzCbY/6e47e51fab.png "Workflow")
+## Known issues
+1. When executing makeAPICalls() on a bing provider it returns *malformed HTTP status code "HTML"*
 
 ## Supported providers
 

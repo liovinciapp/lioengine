@@ -1,8 +1,8 @@
 package lioengine
 
 import (
-    "github.com/dghubble/go-twitter/twitter"
-    "golang.org/x/oauth2"
+    //"github.com/dghubble/go-twitter/twitter"
+    //"golang.org/x/oauth2"
     "sync"
 )
 
