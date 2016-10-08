@@ -11,11 +11,11 @@ type provider struct {
 	// to the api.
 	RequestInfo *apiRequest
 	// Result is a placeholder for the api results.
-	Result map[string]interface{}
+	Result interface{}
 	// Defines if its Bing, Twitter...
 	Type interface{}
 }
 
 // providers contains all the providers supported by this bot.
-var supportedProviders = []string{"Bing"}
+var supportedProviders = []string{"Bing", "Twitter"}
 

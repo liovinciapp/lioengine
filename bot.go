@@ -41,12 +41,15 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	// and blocks this func until all of the searches are done.
 	var wg = new(sync.WaitGroup)
 	for _, provider := range b.currentProviders {
-		wg.Add(1)
 		switch v := provider.Type.(type) {
-		case bingProv:
+		case *bingProv:
+			log.Println("Searching", projectName, "with bing.")
+			wg.Add(1)
 			go v.search(projectName, provider, wg)
 			break
-		case twitterProv:
+		case *twitterProv:
+			log.Println("Searching", projectName, "with twitter.")
+			wg.Add(1)
 			go v.search(projectName, provider, wg)
 			break 
 		}

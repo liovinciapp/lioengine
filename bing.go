@@ -25,8 +25,8 @@ func (b bingProv) newProvider(apiToken string) (prov *provider) {
 	prov = &provider{}
 	prov.Name = "Bing"
 	prov.Token = apiToken
-	prov.Result = make(map[string]interface{})
-	prov.Type = bingProv{}
+	prov.Result = make(map[interface{}]interface{})
+	prov.Type = &bingProv{}
 
 	// Sets a non nil value to RequestInfo
 	prov.RequestInfo = new(apiRequest)
@@ -81,43 +81,31 @@ func (b bingProv) addParamsToURL(urlKeys []string, urlValues []string, url *url.
 
 // search calls to the provider api and fetch results into
 // prov.Result
-func (b bingProv) search(projectName string, prov *provider, wg *sync.WaitGroup) {
-	var err error
+func (b bingProv) search(projectName string, prov *provider, wg *sync.WaitGroup) (err error) {
 	nonSpacedProjectName := replaceSpaces(projectName, "+")
 	urlValues := []string {
 		nonSpacedProjectName,
 		prov.RequestInfo.Quantity.String(),
 	}
 	b.addParamsToURL(prov.RequestInfo.urlKeys, urlValues, prov.RequestInfo.Request.URL)
-	// prov.RequestInfo.Request, err = http.NewRequest("", "https://api.cognitive.microsoft.com/bing/v5.0/news/search?q=iphone+7&count=10", nil)
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// 	wg.Done()
-	// 	return
-	// }
-	//prov.RequestInfo.Request.Header.Add("Ocp-Apim-Subscription-Key", apiToken)
 	resp, err := http.DefaultClient.Do(prov.RequestInfo.Request)
 	if err != nil {
-		log.Println("Client.Do", err.Error())
 		wg.Done()
 		return
 	}
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("ReadAll", err.Error())
 		wg.Done()
 		return
 	}
-	log.Println(resp)
-	log.Println("")
-	log.Println(string(data))
+	
 	err = json.Unmarshal(data, &prov.Result)
 	if err != nil {
-		log.Println("Unmarshal", err.Error())
 		wg.Done()
 		return
 	}
 	log.Println(prov.Result)
 	wg.Done()
+	return
 }

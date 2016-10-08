@@ -6,6 +6,9 @@ liovinci's machine learning ai that finds updates for projects. This still on a 
 ## Status
 Right now i'm working on setting up a nice and wide base so i can add any updates provider in the future whitout having to change the api later. After i finish creating a solid base, i'll start writing the algorithms that will actually make this an Ai Ml Bot.
 
+## About Ai - Ml
+The Ai stuff will be built with a bunch of layers. So lets say, i've a layer for recognizing if the data contains a link, and what that layer does is check if the data contains "http://" (pretty bad). In the future i might want to replace that shitty conditional for a regular expression, so i've only have to replace that layer. Every 'action' that the machine performs for analysing data should have it's own layer.
+
 TLDR: **Still on development. Can be built and executed, but wont work.**
 
 ## Known issues
@@ -60,6 +63,7 @@ func main() {
 
     // Wait until the user press Enter.
     project, _ := reader.ReadString('\n')
+	project = project[:len(project)-2] // Removes \n from input
 
     // Search for updates.
 	// This makes all 3 bots find news for the same project
