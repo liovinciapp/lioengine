@@ -18,4 +18,3 @@ type provider struct {
 
 // providers contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
-

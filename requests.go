@@ -2,9 +2,9 @@ package lioengine
 
 import (
 	"net/http"
-	"strings"
-	"strconv"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 // apiRequest contains all info about the request
@@ -20,13 +20,13 @@ type apiRequest struct {
 
 type countType int
 
-// String returns q value as a string
+// String returns c value as a string
 func (c countType) String() string {
 	ref := reflect.ValueOf(c)
 	return strconv.Itoa(int(ref.Int()))
 }
 
-// Int returns q value as an int
+// Int returns c value as an int
 func (c countType) Int() int {
 	ref := reflect.ValueOf(c)
 	return int(ref.Int())

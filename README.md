@@ -4,7 +4,7 @@
 liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
 
 ## Status
-Right now i'm working on standarizing the data fetched by the providers into a struct for the ai bot analysis, i'll start writing the algorithms that will actually make this an Ai Ml Bot.
+Bot base for fetching data form any kind of news/updates provider is ready. I'm starting to work on the Ai related stuff.
 
 ## About Ai - Ml
 The Ai stuff will be built with a bunch of layers. So lets say, i've a layer for recognizing if the data contains a link, and what that layer does is check if the data contains "http://" (pretty bad). In the future i might want to replace that shitty conditional for a regular expression, so i only have to replace that layer. Every 'action' that the machine performs for analysing data should have it's own layer.
@@ -46,16 +46,17 @@ func main() {
 	bot2 := lioengine.NewBot()
 	bot3 := lioengine.NewBot()
 
-	var numbersOfResultsToBeFetched int
-	numbersOfResultsToBeFetched = 10
+	var numbersOfTwitterResultsToBeFetched, numbersOfBingResultsToBeFetched int
+	numbersOfTwitterResultsToBeFetched = 3
+	numbersOfBingResultsToBeFetched = 5
 	
 	// Sets Bing as our news/updates provider for bots 1, 2 and 3.
-	lioengine.AddUpdatesProvider("Bing", "API TOKEN", numbersOfResultsToBeFetched, bot1, bot2, bot3 ...)
+	lioengine.AddUpdatesProvider("Bing", "API TOKEN", numbersOfBingResultsToBeFetched, bot1, bot2, bot3 ...)
 
 	// Can add more than 1, but right now Bing is the only supported provider.
 	// For twitter we need the OAuth2 Token, cuz the bot uses application-only as it doesn't need
 	// user behavior.
-	lioengine.AddUpdatesProvider("Twitter", "OAuth2 Token", numbersOfResultsToBeFetched, bot1, bot2, bot3)
+	lioengine.AddUpdatesProvider("Twitter", "OAuth2 Token", numbersOfTwitterResultsToBeFetched, bot1, bot2, bot3)
 
 	// Creates a reader so we can read from the console.
 	// Instead of using the os.Stdin we could use a JSON request to get

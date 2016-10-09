@@ -1,11 +1,12 @@
 package lioengine
 
 func (b *Bot) analizeUpdates() (updates []*Update) {
-    return
+	return
 }
 
-// layer wraps all layer functions that will be executed on 
-// *Bot.analizeUpdates()
-type layer struct {}
+// ai will wrap everything related to ai ml analysis
+// of the data
+type ai struct {
 
-var layers  = []*layer{}
+}
+

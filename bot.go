@@ -2,8 +2,10 @@ package lioengine
 
 import (
 	"errors"
-	"log"
 	"sync"
+
+	"github.com/Shixzie/bingnews"
+	"github.com/dghubble/go-twitter/twitter"
 )
 
 // NewBot creates a bot.
@@ -16,6 +18,7 @@ func NewBot() (bot *Bot) {
 // Bot holds all utility for searching news and updates
 type Bot struct {
 	currentProviders []*provider
+	results          []*Update
 }
 
 // FindUpdatesFor is the 'main' function for this package. And will return
@@ -23,13 +26,14 @@ type Bot struct {
 func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) {
 	err = b.makeAPICalls(projectName)
 	if err != nil {
-		log.Printf("Error ocurred at lioengine.go - makeApiCalls(...) : %s", err.Error())
+		err = errors.New("Failure while executing API calls")
 		return
 	}
-	//b.standarizeResults()
+	b.standarizeResults()
+	updates = b.results
 	//updates, err = b.analizeUpdates()
 	// if err != nil {
-	// 	log.Printf("Error ocurred at lioengine.go - analizeUpdates(...) : %s", err.Error())
+	// 	err = errors.New("Failure while analysing updates")
 	// 	return
 	// }
 	return
@@ -42,17 +46,15 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	// and blocks this func until all of the searches are done.
 	var wg = new(sync.WaitGroup)
 	for _, provider := range b.currentProviders {
-		switch v := provider.Type.(type) {
+		switch provType := provider.Type.(type) {
 		case *bingProv:
-			log.Println("Searching", projectName, "with bing.")
 			wg.Add(1)
-			go v.search(projectName, provider, wg)
+			go provType.search(projectName, provider, wg)
 			break
 		case *twitterProv:
-			log.Println("Searching", projectName, "with twitter.")
 			wg.Add(1)
-			go v.search(projectName, provider, wg)
-			break 
+			go provType.search(projectName, provider, wg)
+			break
 		}
 	}
 	wg.Wait()
@@ -60,31 +62,74 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 }
 
 // setupProvider generates a provider corresponding to it's name
-func (b *Bot) setupProvider(providerName, apiToken string, count int) {
+func (b *Bot) setupProvider(providerName, apiToken string, count int) (err error) {
 	switch providerName {
 	case "Bing":
 		bing := bingProv{}
-		provider := bing.setup(apiToken, count)
+		provider, err := bing.setup(apiToken, count)
+		if err != nil {
+			return err
+		}
 		b.currentProviders = append(b.currentProviders, provider)
 		break
 	case "Twitter":
 		twitter := twitterProv{}
-		provider := twitter.setup(apiToken, count)
+		provider, err := twitter.setup(apiToken, count)
+		if err != nil {
+			return err
+		}
 		b.currentProviders = append(b.currentProviders, provider)
 		break
 	}
 	return
 }
 
-// Returns the slide index for the provider with the name
-// providerName.
-func (b *Bot) getProviderIndexByName(providerName string) (index int) {
-	for index, currentProvider := range b.currentProviders {
-		if currentProvider.Name == providerName {
-			return index
+// Returns the provider by it's name.
+func (b *Bot) getProviderByName(providerName string) *provider {
+	for _, provider := range b.currentProviders {
+		if provider.Name == providerName {
+			return provider
 		}
 	}
-	return
+	return nil // Return nil if the provider wasn't found
+}
+
+func (b *Bot) standarizeResults() {
+	// Iterates through all providers
+	for _, provider := range b.currentProviders {
+		switch provType := provider.Type.(type) {
+		// Check if is a twitter provider
+		case *twitterProv:
+			// Check if the provider results are tweets
+			switch tweets := provider.Result.(type) {
+			case []twitter.Tweet:
+				// Standarizes all fetched tweets
+				standarizedTweets := provType.standarize(tweets)
+				// Iterates through all standarized tweets
+				for _, standarizedTweet := range standarizedTweets {
+					// Adds the standarized data to the *Bot.results
+					b.results = append(b.results, standarizedTweet)
+				}
+				break
+			}
+			break
+		// Check if is a bing provider
+		case *bingProv:
+			// Check if the provider results are bing results
+			switch results := provider.Result.(type) {
+			case []*bingnews.Result:
+				// Standarizes all fetched results
+				standarizedResults := provType.standarize(results)
+				// Iterates through all standarized results
+				for _, standarizedResult := range standarizedResults {
+					// Adds the standarized data to the *Bot.results
+					b.results = append(b.results, standarizedResult)
+				}
+				break
+			}
+			break
+		}
+	}
 }
 
 // AddUpdatesProvider adds the news provider by the name given and
@@ -120,7 +165,10 @@ func AddUpdatesProvider(newProviderName, apiToken string, count int, bots ...*Bo
 
 		// If is one of our supported providers and we haven't added it yet, then we add it.
 		if itsASupportedProvider {
-			bot.setupProvider(newProviderName, apiToken, count)
+			err = bot.setupProvider(newProviderName, apiToken, count)
+			if err != nil {
+				return
+			}
 		} else { // If provider not supported.
 			err = errors.New("This provider is not supported by the bot.")
 			return

@@ -2,22 +2,20 @@
 // project name you give it.
 package lioengine
 
-import (
-	"time"
-)
-
-func init() {
-}
-
 // Update is the exported struct that contains
 // all kind of info about the project.
 type Update struct {
-	Name          string    `json:"name"`
-	Description   string    `json:"description"`
-	URL           string    `json:"url"`
-	DatePublished time.Time `json:"date_published"`
-	Img           Img       `json:"img"`
-	Category      string    `json:"category"`
+	Name          string      `json:"name"`
+	Description   string      `json:"description"`
+	URL           string      `json:"url"`
+	DatePublished string      `json:"date_published"`
+	Img           *Img        `json:"img"`
+	Category      string      `json:"category"`
+	Sources       []string    `json:"sources"`
+	// this is used for standarizing the data
+	// so when the bot analyzes the data
+	// it will know 'how' to scan it
+	_type         interface{} 
 	// Maybe more stuff ...
 }
 
@@ -27,5 +25,3 @@ type Img struct {
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 }
-
-
