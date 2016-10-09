@@ -26,6 +26,7 @@ func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) 
 		log.Printf("Error ocurred at lioengine.go - makeApiCalls(...) : %s", err.Error())
 		return
 	}
+	//b.standarizeResults()
 	//updates, err = b.analizeUpdates()
 	// if err != nil {
 	// 	log.Printf("Error ocurred at lioengine.go - analizeUpdates(...) : %s", err.Error())
@@ -59,16 +60,16 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 }
 
 // setupProvider generates a provider corresponding to it's name
-func (b *Bot) setupProvider(providerName, apiToken string) {
+func (b *Bot) setupProvider(providerName, apiToken string, count int) {
 	switch providerName {
 	case "Bing":
 		bing := bingProv{}
-		provider := bing.setup(apiToken)
+		provider := bing.setup(apiToken, count)
 		b.currentProviders = append(b.currentProviders, provider)
 		break
 	case "Twitter":
 		twitter := twitterProv{}
-		provider := twitter.setup(apiToken)
+		provider := twitter.setup(apiToken, count)
 		b.currentProviders = append(b.currentProviders, provider)
 		break
 	}
@@ -91,7 +92,7 @@ func (b *Bot) getProviderIndexByName(providerName string) (index int) {
 // This function should be called before FindUpdatesFor().
 // This is also designed to be called multiple times.
 // Current supported providers are: Bing.
-func AddUpdatesProvider(newProviderName, apiToken string, bots ...*Bot) (err error) {
+func AddUpdatesProvider(newProviderName, apiToken string, count int, bots ...*Bot) (err error) {
 	//Iterates through all bots to add the providers
 	for _, bot := range bots {
 		var alreadyAdded = false
@@ -119,7 +120,7 @@ func AddUpdatesProvider(newProviderName, apiToken string, bots ...*Bot) (err err
 
 		// If is one of our supported providers and we haven't added it yet, then we add it.
 		if itsASupportedProvider {
-			bot.setupProvider(newProviderName, apiToken)
+			bot.setupProvider(newProviderName, apiToken, count)
 		} else { // If provider not supported.
 			err = errors.New("This provider is not supported by the bot.")
 			return

@@ -4,26 +4,24 @@
 liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
 
 ## Status
-Right now i'm working on setting up a nice and wide base so i can add any updates provider in the future whitout having to change the api later. After i finish creating a solid base, i'll start writing the algorithms that will actually make this an Ai Ml Bot.
+Right now i'm working on standarizing the data fetched by the providers into a struct for the ai bot analysis, i'll start writing the algorithms that will actually make this an Ai Ml Bot.
 
 ## About Ai - Ml
-The Ai stuff will be built with a bunch of layers. So lets say, i've a layer for recognizing if the data contains a link, and what that layer does is check if the data contains "http://" (pretty bad). In the future i might want to replace that shitty conditional for a regular expression, so i've only have to replace that layer. Every 'action' that the machine performs for analysing data should have it's own layer.
+The Ai stuff will be built with a bunch of layers. So lets say, i've a layer for recognizing if the data contains a link, and what that layer does is check if the data contains "http://" (pretty bad). In the future i might want to replace that shitty conditional for a regular expression, so i only have to replace that layer. Every 'action' that the machine performs for analysing data should have it's own layer.
 
 TLDR: **Still on development. Can be built and executed, but wont work.**
 
-## Known issues
-1. When executing makeAPICalls() on a bing provider it returns *malformed HTTP status code "HTML"*
 
 ## Supported providers
 
 1. Bing
+2. Twitter
 
 ## Future providers
 
-1. Twitter
-2. Facebook
-3. Google (This wasn't the first one because it's news API is deprecated)
-4. Maybe some famous pages, but that wont happen soon.
+1. Facebook
+2. Google (This wasn't the first one because it's news API is deprecated)
+3. Maybe some famous pages, but that wont happen soon.
 
 ## Installation
 ```
@@ -47,11 +45,17 @@ func main() {
 	bot1 := lioengine.NewBot()
 	bot2 := lioengine.NewBot()
 	bot3 := lioengine.NewBot()
+
+	var numbersOfResultsToBeFetched int
+	numbersOfResultsToBeFetched = 10
 	
 	// Sets Bing as our news/updates provider for bots 1, 2 and 3.
-	lioengine.AddUpdatesProvider("Bing", "API TOKEN", bot1, bot2, bot3 ...)
+	lioengine.AddUpdatesProvider("Bing", "API TOKEN", numbersOfResultsToBeFetched, bot1, bot2, bot3 ...)
+
 	// Can add more than 1, but right now Bing is the only supported provider.
-	lioengine.AddUpdatesProvider("Twitter", "API TOKEN/OAuth Token", bot1, bot2, bot3)
+	// For twitter we need the OAuth2 Token, cuz the bot uses application-only as it doesn't need
+	// user behavior.
+	lioengine.AddUpdatesProvider("Twitter", "OAuth2 Token", numbersOfResultsToBeFetched, bot1, bot2, bot3)
 
 	// Creates a reader so we can read from the console.
 	// Instead of using the os.Stdin we could use a JSON request to get

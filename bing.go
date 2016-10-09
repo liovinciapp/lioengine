@@ -15,17 +15,17 @@ import (
 type bingProv struct{}
 
 // setup returns a new initialized bing provider.
-func (b bingProv) setup(apiToken string) (prov *provider) {
-	prov = b.newProvider(apiToken)
+func (b bingProv) setup(apiToken string, count int) (prov *provider) {
+	prov = b.newProvider(apiToken, count)
 	return
 }
 
 // newProvider creates a ready to use bing provider.
-func (b bingProv) newProvider(apiToken string) (prov *provider) {
+func (b bingProv) newProvider(apiToken string, count int) (prov *provider) {
 	prov = &provider{}
 	prov.Name = "Bing"
 	prov.Token = apiToken
-	prov.Result = make(map[interface{}]interface{})
+	prov.Result = make(map[string]interface{})
 	prov.Type = &bingProv{}
 
 	// Sets a non nil value to RequestInfo
@@ -37,9 +37,10 @@ func (b bingProv) newProvider(apiToken string) (prov *provider) {
 	keys := []string{ // Maybe in the future the user could choose what keys use.
 		"q",
 		"count",
+		"mkt",
 	} 
 	prov.RequestInfo.urlKeys = keys
-	prov.RequestInfo.Quantity = 10 // Fetch first 10 results
+	prov.RequestInfo.Count = countType(count) // Number of results to be fetched
 	b.setupDefaultHTTPRequest(apiToken, prov.RequestInfo.Request)
 
 	return
@@ -63,6 +64,8 @@ func (b bingProv) setupDefaultHTTPRequest(apiToken string, req *http.Request) {
 // setupDefaultUrlWithParameters generates the url with parameters to be used
 // when makeApiCall() calls to the api.
 func (b bingProv) addParamsToURL(urlKeys []string, urlValues []string, url *url.URL) {
+	// We use a buffer because it's the most efficient way to
+	// concatenate strings
 	var buffer bytes.Buffer
 	var isLastIteration = false
 	for index, key := range urlKeys {
@@ -82,10 +85,14 @@ func (b bingProv) addParamsToURL(urlKeys []string, urlValues []string, url *url.
 // search calls to the provider api and fetch results into
 // prov.Result
 func (b bingProv) search(projectName string, prov *provider, wg *sync.WaitGroup) (err error) {
-	nonSpacedProjectName := replaceSpaces(projectName, "+")
+	nonSpacedProjectName := replaceSpaces(projectName, "+") // Replace spaces with the + symbol
+
+	// Have to match the order defined on prov.RequestInfo.urlKeys
+	// when setting up the provider.
 	urlValues := []string {
-		nonSpacedProjectName,
-		prov.RequestInfo.Quantity.String(),
+		nonSpacedProjectName, // Query -> q
+		prov.RequestInfo.Count.String(), // Count -> count
+		"en-US", // Mkt -> mkt
 	}
 	b.addParamsToURL(prov.RequestInfo.urlKeys, urlValues, prov.RequestInfo.Request.URL)
 	resp, err := http.DefaultClient.Do(prov.RequestInfo.Request)

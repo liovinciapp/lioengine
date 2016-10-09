@@ -14,21 +14,21 @@ type apiRequest struct {
 	urlKeys []string //eg. []string {"key1", "key2"}
 	// Request is used to set extra info, such as headers.
 	Request *http.Request
-	// Quantity is the number of results to be fetch
-	Quantity quantity
+	// Count is the number of results to be fetch
+	Count countType
 }
 
-type quantity int
+type countType int
 
 // String returns q value as a string
-func (q quantity) String() string {
-	ref := reflect.ValueOf(q)
+func (c countType) String() string {
+	ref := reflect.ValueOf(c)
 	return strconv.Itoa(int(ref.Int()))
 }
 
 // Int returns q value as an int
-func (q quantity) Int() int {
-	ref := reflect.ValueOf(q)
+func (c countType) Int() int {
+	ref := reflect.ValueOf(c)
 	return int(ref.Int())
 }
 
