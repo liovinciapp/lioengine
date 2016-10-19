@@ -1,0 +1,16 @@
+
+type Update struct {               Bing        : Twitter
+	Title          string          Title       : empty string
+	Description    string          Description : Text
+	Link           string          Link        : Source/IdStr
+	DatePublished  string          PubDate     : CreatedAt
+	Img            Img             Img         : Nil
+	Category       string          Category    : empty string
+	Sources        string          Sources     : User.Name
+}
+
+type Img struct {
+	Link   string 
+	Width  int    
+	Height int    
+}

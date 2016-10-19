@@ -2,20 +2,24 @@
 // project name you give it.
 package lioengine
 
+// supportedProviders contains all the providers supported by this bot.
+var supportedProviders = []string{"Bing", "Twitter"}
+
 // Update is the exported struct that contains
 // all kind of info about the project.
 type Update struct {
-	Name          string      `json:"name"`
-	Description   string      `json:"description"`
-	URL           string      `json:"url"`
-	DatePublished string      `json:"date_published"`
-	Img           *Img        `json:"img"`
-	Category      string      `json:"category"`
-	Sources       []string    `json:"sources"`
+	Title         string   `json:"title"`
+	Description   string   `json:"description"`
+	Link          string   `json:"link"`
+	DatePublished string   `json:"date_published"`
+	Img           *Img     `json:"img"`
+	Category      string   `json:"category"`
+	Sources       []string `json:"sources"`
 	// this is used for standarizing the data
 	// so when the bot analyzes the data
 	// it will know 'how' to scan it
-	_type         interface{} 
+	_type  interface{}
+	points int
 	// Maybe more stuff ...
 }
 
