@@ -49,7 +49,7 @@ func (t twitterProv) newProvider(apiToken string, count int) (err error) {
 func (t *twitterProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
 	search, resp, err := t.Client.Search.Tweets(&twitter.SearchTweetParams{
 		Query: projectName,
-		Count: t.RequestInfo.Count,
+		Count: t.Count,
 	})
 	if err != nil {
 		errs <- err

@@ -2,6 +2,10 @@
 // project name you give it.
 package lioengine
 
+import (
+	"strings"
+)
+
 // supportedProviders contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
 

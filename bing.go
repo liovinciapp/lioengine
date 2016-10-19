@@ -13,9 +13,6 @@ type bingProv struct {
 	Name string
 	// Token used to authenticate to the api.
 	Token string
-	// RequestInfo contains everything related to the resquest made
-	// to the api.
-	RequestInfo *apiRequest
 	// Engine is the bingnews engine used to request the
 	// API.
 	Engine *bingnews.Engine
