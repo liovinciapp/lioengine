@@ -52,6 +52,15 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	wg.Add(len(b.currentProvidersNames))
 	var errs = make(chan error, len(b.currentProvidersNames))
 	defer close(errs)
+
+	// Search with bing
+	go b.bing.search(projectName, &wg, errs)
+
+	// Search with twitter
+	go b.twitter.search(projectName, &wg, errs)
+
+	err = <- errs
+
 	wg.Wait()
 	return
 }

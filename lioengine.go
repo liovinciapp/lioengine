@@ -29,3 +29,16 @@ type Img struct {
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 }
+
+// replaceSpaces replaces spaces of text with char if the text contains
+// spaces.
+func replaceSpaces(text, char string) (newText string) {
+	// Checks if the text contains spaces
+	if strings.Contains(text, " ") {
+		// If the text contains spaces it replaces them with char
+		newText = strings.Replace(text, " ", char, -1)
+		return
+	}
+	// If text doesn't contain spaces, return the same text
+	return text
+}

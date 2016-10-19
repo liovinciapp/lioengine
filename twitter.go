@@ -15,9 +15,8 @@ type twitterProv struct {
 	Name string
 	// Token used to authenticate to the api.
 	Token string
-	// RequestInfo contains everything related to the resquest made
-	// to the api.
-	RequestInfo *apiRequest
+	// Count is the number of tweets to be fetched
+	Count int
 	// Client is the twitter client used to request the
 	// API.
 	Client *twitter.Client
@@ -34,9 +33,7 @@ func (t twitterProv) newProvider(apiToken string, count int) (err error) {
 	t.Name = "Twitter"
 	t.Token = apiToken
 
-	// Sets a non nil value to RequestInfo
-	t.RequestInfo = new(apiRequest)
-	t.RequestInfo.Count = count /// Number of results to be fetched
+	t.Count = count /// Number of results to be fetched
 
 	config := &oauth2.Config{}
 	token := &oauth2.Token{AccessToken: t.Token}
