@@ -8,7 +8,6 @@ import (
 // NewBot creates a bot.
 func NewBot() (bot *Bot) {
 	bot = new(Bot)
-	bot.currentProvidersNames = []string{}
 	bot.bing = new(bingProv)
 	bot.twitter = new(twitterProv)
 	return
@@ -53,12 +52,19 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	var errs = make(chan error, len(b.currentProvidersNames))
 	defer close(errs)
 
-	// Search with bing
-	go b.bing.search(projectName, &wg, errs)
-
-	// Search with twitter
-	go b.twitter.search(projectName, &wg, errs)
-
+	for _, provider := range b.currentProvidersNames {
+		switch provider {
+			case "Bing":
+				// Search with bing
+				go b.bing.search(projectName, &wg, errs)
+				break
+			case "Twitter":
+				// Search with twitter
+				go b.twitter.search(projectName, &wg, errs)
+				break
+		}
+	}
+	
 	err = <- errs
 
 	wg.Wait()

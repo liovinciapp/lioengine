@@ -6,6 +6,7 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"golang.org/x/oauth2"
+	"errors"
 )
 
 // Adds twitter provider support for the bot.
@@ -47,10 +48,15 @@ func (t twitterProv) newProvider(apiToken string, count int) (err error) {
 // search calls to the provider api and fetch results into
 // prov.Result
 func (t *twitterProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
-	search, resp, err := t.Client.Search.Tweets(&twitter.SearchTweetParams{
-		Query: projectName,
-		Count: t.Count,
-	})
+	var searchParams = new(twitter.SearchTweetParams)
+	searchParams.Query = projectName
+	searchParams.Count = t.Count
+	if t.Client.Search == nil {
+		errs <- errors.New("twitter client search is nil")
+		wg.Done()
+		return
+	}
+	search, resp, err := t.Client.Search.Tweets(searchParams)
 	if err != nil {
 		errs <- err
 		wg.Done()
