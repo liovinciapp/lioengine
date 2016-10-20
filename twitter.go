@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"sync"
 
-	"errors"
 	"github.com/dghubble/go-twitter/twitter"
 	"golang.org/x/oauth2"
 )
@@ -24,9 +23,6 @@ type twitterProv struct {
 	// Results will contain every result fetched from
 	// the API.
 	Results []twitter.Tweet
-	// httpClient is the http client used by our twitter
-	// Client
-	httpClient *http.Client
 }
 
 // newProvider creates a ready to use twitter provider.
@@ -34,42 +30,35 @@ func (t *twitterProv) newProvider(apiToken string, count int) (err error) {
 
 	// For twitter we'll use github.com/dghubble/go-twitter/twitter.
 
-	t.Name = "Twitter"
-	t.Token = apiToken
+	t.Name = "Twitter" // Name
+	t.Token = apiToken // API token
+	t.Count = count    // Number of results to be fetched
 
-	t.Count = count /// Number of results to be fetched
+	config := new(oauth2.Config)
+	token := new(oauth2.Token)
+	token.AccessToken = t.Token
 
-	config := &oauth2.Config{}
-	token := &oauth2.Token{AccessToken: t.Token}
 	// http.Client will automatically authorize Requests
-	t.httpClient = config.Client(oauth2.NoContext, token)
-	t.Client = twitter.NewClient(t.httpClient)
+	httpClient := config.Client(oauth2.NoContext, token)
+	t.Client = twitter.NewClient(httpClient)
 
 	return
 }
 
 // search calls to the provider api and fetch results into
 // prov.Result
-func (t *twitterProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
+func (t *twitterProv) search(projectName string, wg *sync.WaitGroup) (err error) {
+	defer wg.Done()
 	var searchParams = new(twitter.SearchTweetParams)
 	searchParams.Query = projectName
 	searchParams.Count = t.Count
-	if t.Client.Search == nil {
-		errs <- errors.New("twitter client search is nil")
-		wg.Done()
-		return
-	}
 	search, resp, err := t.Client.Search.Tweets(searchParams)
 	if err != nil {
-		errs <- err
-		wg.Done()
-		return
+		return err
 	}
 	if resp.StatusCode == http.StatusOK {
 		t.Results = search.Statuses
 	}
-
-	wg.Done()
 	return
 }
 

@@ -45,14 +45,12 @@ func (b *bingProv) newProvider(apiToken string, count int) (err error) {
 
 // search calls to the provider api and fetch results into
 // b.Result
-func (b *bingProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
-	var err error
+func (b *bingProv) search(projectName string, wg *sync.WaitGroup) (err error) {
+	defer wg.Done()
 	b.Results, err = b.Engine.SearchFor(projectName)
 	if err != nil {
-		errs <- err
-		wg.Done()
+		return err
 	}
-	wg.Done()
 	return
 }
 

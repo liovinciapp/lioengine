@@ -48,24 +48,21 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	// wg waits for all concurrent searches to finish
 	// and blocks this func until all of the searches are done.
 	var wg sync.WaitGroup
-	wg.Add(len(b.currentProvidersNames))
-	var errs = make(chan error, len(b.currentProvidersNames))
-	defer close(errs)
 
 	for _, provider := range b.currentProvidersNames {
 		switch provider {
-			case "Bing":
-				// Search with bing
-				go b.bing.search(projectName, &wg, errs)
-				break
-			case "Twitter":
-				// Search with twitter
-				go b.twitter.search(projectName, &wg, errs)
-				break
+		case "Bing":
+			// Search with bing
+			wg.Add(1)
+			go b.bing.search(projectName, &wg)
+			break
+		case "Twitter":
+			// Search with twitter
+			wg.Add(1)
+			go b.twitter.search(projectName, &wg)
+			break
 		}
 	}
-	
-	err = <- errs
 
 	wg.Wait()
 	return
