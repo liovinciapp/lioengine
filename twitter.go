@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"sync"
 
+	"errors"
 	"github.com/dghubble/go-twitter/twitter"
 	"golang.org/x/oauth2"
-	"errors"
 )
 
 // Adds twitter provider support for the bot.
@@ -24,10 +24,13 @@ type twitterProv struct {
 	// Results will contain every result fetched from
 	// the API.
 	Results []twitter.Tweet
+	// httpClient is the http client used by our twitter
+	// Client
+	httpClient *http.Client
 }
 
 // newProvider creates a ready to use twitter provider.
-func (t twitterProv) newProvider(apiToken string, count int) (err error) {
+func (t *twitterProv) newProvider(apiToken string, count int) (err error) {
 
 	// For twitter we'll use github.com/dghubble/go-twitter/twitter.
 
@@ -39,8 +42,8 @@ func (t twitterProv) newProvider(apiToken string, count int) (err error) {
 	config := &oauth2.Config{}
 	token := &oauth2.Token{AccessToken: t.Token}
 	// http.Client will automatically authorize Requests
-	httpClient := config.Client(oauth2.NoContext, token)
-	t.Client = twitter.NewClient(httpClient)
+	t.httpClient = config.Client(oauth2.NoContext, token)
+	t.Client = twitter.NewClient(t.httpClient)
 
 	return
 }

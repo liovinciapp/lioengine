@@ -65,10 +65,14 @@ func (b *bingProv) standarize() (updates []*Update) {
 		newUpdate.Description = result.Description
 		newUpdate.Link = result.Link
 		newUpdate.DatePublished = result.PubDate
-		newUpdate.Img = new(Img)
-		newUpdate.Img.Link = result.Img.ContentURL
-		newUpdate.Img.Width = result.Img.Width
-		newUpdate.Img.Height = result.Img.Height
+		if result.Img != nil {
+			newUpdate.Img = new(Img)
+			newUpdate.Img.Link = result.Img.ContentURL
+			newUpdate.Img.Width = result.Img.Width
+			newUpdate.Img.Height = result.Img.Height
+		} else {
+			newUpdate.Img = new(Img)
+		}
 		newUpdate.Category = result.Category
 		newUpdate.Sources = result.Sources
 		newUpdate._type = &bingProv{}
