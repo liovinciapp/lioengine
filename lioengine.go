@@ -3,11 +3,21 @@
 package lioengine
 
 import (
+	// "log"
 	"strings"
 )
 
 // supportedProviders contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
+
+func init() {
+	// var err error
+
+	// err = fetchKeywords()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+}
 
 // Update is the exported struct that contains
 // all kind of info about the project.
@@ -19,11 +29,9 @@ type Update struct {
 	Img           *Img     `json:"img"`
 	Category      string   `json:"category"`
 	Sources       []string `json:"sources"`
-	// this is used for standarizing the data
-	// so when the bot analyzes the data
-	// it will know 'how' to scan it
-	_type  interface{}
+
 	points int
+	words  []byte
 	// Maybe more stuff ...
 }
 

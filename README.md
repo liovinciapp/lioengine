@@ -1,16 +1,13 @@
-[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg?maxAge=2592000)]()  [![AUR](https://img.shields.io/aur/license/yaourt.svg?maxAge=2592000)]() [![GoDoc](https://godoc.org/github.com/Shixzie/lioengine?status.svg)](https://godoc.org/github.com/Shixzie/lioengine)
+[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg?maxAge=2592000)]()  [![GoDoc](https://godoc.org/github.com/Shixzie/lioengine?status.svg)](https://godoc.org/github.com/Shixzie/lioengine)
 
 # lioengine
-liovinci's machine learning ai that finds updates for projects. This still on a very early stage of development so don't spect to have it working soon.
+liovinci's bot for finding updates on already existing projects.
 
 ## Status
-Bot base for fetching data form any kind of news/updates provider is ready. I'm starting to work on the Ai related stuff.
+Bot can fetch data and standarize the results of all supported providers into one struct. All that's left is implementing the words matcher.
 
-## About Ai - Ml
-The Ai stuff will be built with a bunch of layers. So lets say, i've a layer for recognizing if the data contains a link, and what that layer does is check if the data contains "http://" (pretty bad). In the future i might want to replace that shitty conditional for a regular expression, so i only have to replace that layer. Every 'action' that the machine performs for analysing data should have it's own layer.
-
-TLDR: **Still on development. Can be built and executed, but wont work.**
-
+## How it works
+Basically, the bot fetches *n* number of results from the supported providers and puts the results into one *common struct* for text analysis.
 
 ## Supported providers
 
@@ -96,6 +93,3 @@ func main() {
 	...
 }
 ```
-
-## Documentation
-####    [Godoc](http://godoc.org/github.com/Shixzie/lioengine)

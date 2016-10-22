@@ -30,11 +30,13 @@ func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) 
 		return
 	}
 	b.standarizeResults()
-	updates = b.results
-	// err = b.analizeUpdates(projectName)
+
+	updates = b.results // this is temporal
+
+	// updates, err = b.analizeUpdates(projectName)
 	// if err != nil {
-	// 	err = errors.New("Failure while analysing updates")
-	// 	return
+	// 	err = errors.New("failure while analysing updates")
+	// 	return nil, err
 	// }
 	return
 }
@@ -48,19 +50,30 @@ func (b *Bot) makeAPICalls(projectName string) (err error) {
 	// wg waits for all concurrent searches to finish
 	// and blocks this func until all of the searches are done.
 	var wg sync.WaitGroup
+	var errs = make(chan error, 2)
+	defer close(errs) // close the chan
 
 	for _, provider := range b.currentProvidersNames {
 		switch provider {
 		case "Bing":
 			// Search with bing
 			wg.Add(1)
-			go b.bing.search(projectName, &wg)
+			go b.bing.search(projectName, &wg, errs)
 			break
 		case "Twitter":
 			// Search with twitter
 			wg.Add(1)
-			go b.twitter.search(projectName, &wg)
+			go b.twitter.search(projectName, &wg, errs)
 			break
+		}
+	}
+
+	// TODO: check if err handling works
+	// check for errs
+	for i := 0; i < len(b.currentProvidersNames); i++ {
+		err = <-errs
+		if err != nil {
+			return err
 		}
 	}
 
@@ -90,25 +103,17 @@ func (b *Bot) setupProvider(providerName, apiToken string, count int) (err error
 }
 
 func (b *Bot) standarizeResults() {
-	// Adds twitter results
-	// Standarizes all fetched tweets
-	standarizedTweets := b.twitter.standarize()
-	// Iterates through all standarized tweets
-	for _, standarizedTweet := range standarizedTweets {
-		// Adds the standarized data to the *Bot.results
-		b.results = append(b.results, standarizedTweet)
-	}
+	var wg sync.WaitGroup
 
-	// #####################################
+	wg.Add(2)
+
+	// Adds twitter results
+	go b.twitter.standarize(&b.results, &wg)
 
 	// Adds bing results
-	// Standarizes all fetched results
-	standarizedResults := b.bing.standarize()
-	// Iterates through all standarized results
-	for _, standarizedResult := range standarizedResults {
-		// Adds the standarized data to the *Bot.results
-		b.results = append(b.results, standarizedResult)
-	}
+	go b.bing.standarize(&b.results, &wg)
+
+	wg.Wait()
 }
 
 // AddUpdatesProvider adds the news provider by the name given and
@@ -117,7 +122,7 @@ func (b *Bot) standarizeResults() {
 // This is also designed to be called multiple times.
 // Current supported providers are: Bing, Twitter.
 //
-// For the Twitter provider you'll need an OAuth2 Token.
+// For the Twitter provider you'll need an OAuth2 Token.&
 // Because this bot uses the Application-only mode instead
 // of Application-user, check https://dev.twitter.com/oauth
 // for more info.

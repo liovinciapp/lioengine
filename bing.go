@@ -45,18 +45,21 @@ func (b *bingProv) newProvider(apiToken string, count int) (err error) {
 
 // search calls to the provider api and fetch results into
 // b.Result
-func (b *bingProv) search(projectName string, wg *sync.WaitGroup) (err error) {
+func (b *bingProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
 	defer wg.Done()
+	var err error
 	b.Results, err = b.Engine.SearchFor(projectName)
 	if err != nil {
-		return err
+		errs <- err
+		return
 	}
-	return
+	errs <- nil
 }
 
 // standarize converts the fetched results from the provider
 // into a []*Update
-func (b *bingProv) standarize() (updates []*Update) {
+func (b *bingProv) standarize(updates *[]*Update, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for _, result := range b.Results {
 		newUpdate := &Update{}
 		newUpdate.Title = result.Title
@@ -73,8 +76,7 @@ func (b *bingProv) standarize() (updates []*Update) {
 		}
 		newUpdate.Category = result.Category
 		newUpdate.Sources = result.Sources
-		newUpdate._type = &bingProv{}
-		updates = append(updates, newUpdate)
+		*updates = append(*updates, newUpdate)
 	}
 	return
 }

@@ -4,7 +4,7 @@ type Update struct {               Bing        : Twitter
 	Description    string          Description : Text
 	Link           string          Link        : Source/IdStr
 	DatePublished  string          PubDate     : CreatedAt
-	Img            Img             Img         : Nil
+	Img            Img             Img         : empty Img
 	Category       string          Category    : empty string
 	Sources        string          Sources     : User.Name
 }

@@ -47,35 +47,36 @@ func (t *twitterProv) newProvider(apiToken string, count int) (err error) {
 
 // search calls to the provider api and fetch results into
 // prov.Result
-func (t *twitterProv) search(projectName string, wg *sync.WaitGroup) (err error) {
+func (t *twitterProv) search(projectName string, wg *sync.WaitGroup, errs chan error) {
 	defer wg.Done()
 	var searchParams = new(twitter.SearchTweetParams)
 	searchParams.Query = projectName
 	searchParams.Count = t.Count
 	search, resp, err := t.Client.Search.Tweets(searchParams)
 	if err != nil {
-		return err
+		errs <- err
+		return
 	}
 	if resp.StatusCode == http.StatusOK {
 		t.Results = search.Statuses
 	}
-	return
+	errs <- nil
 }
 
 // standarize converts the fetched results from the provider
 // into a []*Update
-func (t *twitterProv) standarize() (updates []*Update) {
+func (t *twitterProv) standarize(updates *[]*Update, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for _, tweet := range t.Results {
 		newUpdate := &Update{}
 		newUpdate.Title = ""
 		newUpdate.Description = tweet.Text
 		newUpdate.Link = tweet.Source
 		newUpdate.DatePublished = tweet.CreatedAt
-		newUpdate.Img = nil
+		newUpdate.Img = new(Img)
 		newUpdate.Category = ""
 		newUpdate.Sources = []string{tweet.User.Name}
-		newUpdate._type = &twitterProv{}
-		updates = append(updates, newUpdate)
+		*updates = append(*updates, newUpdate)
 	}
 	return
 }
