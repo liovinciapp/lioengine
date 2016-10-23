@@ -71,16 +71,25 @@ func SetMinPoints(points int) {
 // 	points int
 //
 func SetDatabase(name string, hosts []string, database string, table string) (err error) {
+	var errs = make(chan error, 1)
+	defer close(errs)
+
 	lowerName := strings.ToLower(name)
 	switch lowerName {
 	case "rethinkdb":
 		database = lowerName
 		rethink, err = configRethinkdb(hosts, database, table)
+		if err != nil {
+			return err
+		}
+		fetchKeywords(errs)
+		err = <-errs
 		return err
 	default:
 		err = fmt.Errorf("%s database is not supported", lowerName)
 		return err
 	}
+
 }
 
 // replaceSpaces replaces spaces of text with char if the text contains
