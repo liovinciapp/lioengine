@@ -66,10 +66,10 @@ func SetMinPoints(points int) {
 //
 // table is the table name where the keywords are
 // located. The table should have this structure:
-// tableName: {
+//
 // 	word   string
 // 	points int
-// }
+//
 func SetDatabase(name string, hosts []string, database string, table string) (err error) {
 	lowerName := strings.ToLower(name)
 	switch lowerName {
