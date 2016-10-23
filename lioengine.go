@@ -1,23 +1,25 @@
-// Package lioengine is a ml bot that will find updates for the
-// project name you give it.
+// Package lioengine is a bot for finding updates on already existing projects.
 package lioengine
 
 import (
-	// "log"
+	"fmt"
 	"strings"
 )
 
 // supportedProviders contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
 
-func init() {
-	// var err error
+// keywords will be initialized on
+// the init() func.
+var keywords []*keyword
 
-	// err = fetchKeywords()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-}
+// minPoints is the minimun value for results
+// to be considered as updates.
+var minPoints = 15
+
+// database is the current database used
+// for storing the keywords
+var database string
 
 // Update is the exported struct that contains
 // all kind of info about the project.
@@ -31,7 +33,7 @@ type Update struct {
 	Sources       []string `json:"sources"`
 
 	points int
-	words  []byte
+	words  []string
 	// Maybe more stuff ...
 }
 
@@ -40,6 +42,45 @@ type Img struct {
 	Link   string `json:"link"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
+}
+
+// SetMinPoints sets the minimum points
+// needed for an update to be considered
+// one. The higher the harder for the fetched
+// results to 'become' an update (less results).
+// And the lower the easier to get more updates.
+func SetMinPoints(points int) {
+	minPoints = points
+}
+
+// SetDatabase sets the database that will
+// be used.
+//
+// name is the storage engine that we'll use.
+// valid names are: rethinkdb.
+//
+// hosts is the host for the given engine.
+//
+// database is the database name where the keywords
+// are located.
+//
+// table is the table name where the keywords are
+// located. The table should have this structure:
+// tableName: {
+// 	word   string
+// 	points int
+// }
+func SetDatabase(name string, hosts []string, database string, table string) (err error) {
+	lowerName := strings.ToLower(name)
+	switch lowerName {
+	case "rethinkdb":
+		database = lowerName
+		rethink, err = configRethinkdb(hosts, database, table)
+		return err
+	default:
+		err = fmt.Errorf("%s database is not supported", lowerName)
+		return err
+	}
 }
 
 // replaceSpaces replaces spaces of text with char if the text contains

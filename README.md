@@ -4,7 +4,12 @@
 liovinci's bot for finding updates on already existing projects.
 
 ## Status
-Bot can fetch data and standarize the results of all supported providers into one struct. All that's left is implementing the words matcher.
+Bot should be ready for use. 
+
+## Goals
+1. Automate the multi-bot search proccess so users don't have to make it.
+2. Add support for more storage engines, such as mysql, postgresql, and mongo. 
+3. Some stuff that i can't remember right now.
 
 ## How it works
 Basically, the bot fetches *n* number of results from the supported providers and puts the results into one *common struct* for text analysis.
@@ -43,17 +48,25 @@ func main() {
 	bot2 := lioengine.NewBot()
 	bot3 := lioengine.NewBot()
 
-	var numbersOfTwitterResultsToBeFetched, numbersOfBingResultsToBeFetched int
-	numbersOfTwitterResultsToBeFetched = 3
-	numbersOfBingResultsToBeFetched = 5
+	lioengine.SetDatabase("rethinkdb",
+	 []string{
+		 "localhost", // the hosts
+	 },
+	 "test", 		  // database name
+	 "keywords", 	  // table name
+	)
+
+	var numbersOfTwitterResults, numbersOfBingResults int
+	numbersOfTwitterResults = 3
+	numbersOfBingResults = 5
 	
 	// Sets Bing as our news/updates provider for bots 1, 2 and 3.
-	lioengine.AddUpdatesProvider("Bing", "API TOKEN", numbersOfBingResultsToBeFetched, bot1, bot2, bot3 ...)
+	lioengine.AddUpdatesProvider("Bing", "API TOKEN", numbersOfBingResults, bot1, bot2, bot3 ...)
 
 	// Can add more than 1, but right now Bing is the only supported provider.
 	// For twitter we need the OAuth2 Token, cuz the bot uses application-only as it doesn't need
 	// user behavior.
-	lioengine.AddUpdatesProvider("Twitter", "OAuth2 Token", numbersOfTwitterResultsToBeFetched, bot1, bot2, bot3)
+	lioengine.AddUpdatesProvider("Twitter", "OAuth2 Token", numbersOfTwitterResults, bot1, bot2, bot3)
 
 	// Creates a reader so we can read from the console.
 	// Instead of using the os.Stdin we could use a JSON request to get
@@ -90,6 +103,6 @@ func main() {
 	for _, update := range updates3 {
 		// ...
 	}
-	...
+	// ...
 }
 ```

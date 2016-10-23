@@ -24,20 +24,25 @@ type Bot struct {
 // FindUpdatesFor is the 'main' function for this package. And will return
 // an []*Update for the given project name.
 func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) {
+	var errs = make(chan error, 1)
+	defer close(errs)
+
+	fetchKeywords(errs)
+	err = <-errs
+	if err != nil {
+		return nil, err
+	}
+
 	err = b.makeAPICalls(projectName)
 	if err != nil {
 		err = errors.New("failure while executing API calls")
-		return
+		return nil, err
 	}
+
 	b.standarizeResults()
 
-	updates = b.results // this is temporal
+	updates = b.analizeUpdates(projectName)
 
-	// updates, err = b.analizeUpdates(projectName)
-	// if err != nil {
-	// 	err = errors.New("failure while analysing updates")
-	// 	return nil, err
-	// }
 	return
 }
 
