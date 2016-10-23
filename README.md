@@ -56,6 +56,8 @@ func main() {
 	 "keywords", 	  // table name
 	)
 
+	lioengine.SetMinPoints(25) // The default is 15 <- this may change
+
 	var numbersOfTwitterResults, numbersOfBingResults int
 	numbersOfTwitterResults = 3
 	numbersOfBingResults = 5
