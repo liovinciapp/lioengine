@@ -64,6 +64,10 @@ func splitWords(updates *[]*Update) {
 			allWords = append(allWords, updt.Sources...)                         // Add the sources
 
 			updt.words = append(updt.words, allWords...) // Adds all words to the words field
+
+			for i, word := range updt.words {
+				updt.words[i] = strings.ToLower(word)
+			}
 		}(&wg, update)
 	}
 	wg.Wait()
@@ -89,8 +93,8 @@ func calculatePoints(updates *[]*Update, projectName string) {
 								points += 3 // It's not a keyword, but the project name
 							}
 							repeatedWords = append(repeatedWords, word)
-							continue WORD
 						}
+						continue WORD
 					}
 				}
 			}
