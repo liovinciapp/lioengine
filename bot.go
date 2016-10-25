@@ -2,6 +2,7 @@ package lioengine
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -26,7 +27,7 @@ type Bot struct {
 func (b *Bot) FindUpdatesFor(projectName string) (updates []*Update, err error) {
 	err = b.makeAPICalls(projectName)
 	if err != nil {
-		err = errors.New("failure while executing API calls")
+		err = fmt.Errorf("failure while executing API calls: %s", err)
 		return nil, err
 	}
 

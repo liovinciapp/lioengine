@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// sets if using appengine
+var appengine bool
+
 // supportedProviders contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
 
@@ -39,6 +42,11 @@ type Img struct {
 	Link   string `json:"link"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
+}
+
+// UseAppengine uses appengine requests
+func UseAppengine() {
+	appengine = true
 }
 
 // SetMinPoints sets the minimum points
@@ -83,9 +91,9 @@ func SetDatabase(name string, hosts []string, database string, table string, poi
 		fetchKeywords(errs)
 		err = <-errs
 		if err != nil {
-			fmt.Errorf("error while fetching keywords: %s", err)
+			return fmt.Errorf("error while fetching keywords: %s", err)
 		}
-		return err
+		return nil
 	default:
 		err = fmt.Errorf("%s database is not supported", lowerName)
 		return err
