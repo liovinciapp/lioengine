@@ -3,6 +3,7 @@ package lioengine
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -11,15 +12,11 @@ var supportedProviders = []string{"Bing", "Twitter"}
 
 // keywords will be initialized on
 // the init() func.
-var keywords []*keyword
+var keywords []*Keyword
 
 // minPoints is the minimun value for results
 // to be considered as updates.
 var minPoints = 15
-
-// database is the current database used
-// for storing the keywords
-var database string
 
 // Update is the exported struct that contains
 // all kind of info about the project.
@@ -51,6 +48,7 @@ type Img struct {
 // And the lower the easier to get more updates.
 func SetMinPoints(points int) {
 	minPoints = points
+	log.Println("minPoints now is", minPoints)
 }
 
 // SetDatabase sets the database that will
@@ -70,20 +68,23 @@ func SetMinPoints(points int) {
 // 	word   string
 // 	points int
 //
-func SetDatabase(name string, hosts []string, database string, table string) (err error) {
+func SetDatabase(name string, hosts []string, database string, table string, points int) (err error) {
 	var errs = make(chan error, 1)
 	defer close(errs)
 
 	lowerName := strings.ToLower(name)
 	switch lowerName {
 	case "rethinkdb":
-		database = lowerName
 		rethink, err = configRethinkdb(hosts, database, table)
 		if err != nil {
 			return err
 		}
+		SetMinPoints(points)
 		fetchKeywords(errs)
 		err = <-errs
+		if err != nil {
+			fmt.Errorf("error while fetching keywords: %s", err)
+		}
 		return err
 	default:
 		err = fmt.Errorf("%s database is not supported", lowerName)
