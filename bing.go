@@ -36,6 +36,7 @@ func (b *bingProv) newProvider(apiToken string, count int) (err error) {
 	b.Config = bingnews.NewConfig(apiToken)
 	b.Config.Count = count
 	b.Config.Mkt = "en-US"
+	b.Config.Appengine = true
 	b.Engine, err = bingnews.NewEngine(b.Config)
 	if err != nil {
 		return
