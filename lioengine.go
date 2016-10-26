@@ -2,7 +2,6 @@
 package lioengine
 
 import (
-	"fmt"
 	"log"
 	"strings"
 )
@@ -20,6 +19,16 @@ var keywords []*Keyword
 // minPoints is the minimun value for results
 // to be considered as updates.
 var minPoints = 15
+
+func init() {
+	var errs = make(chan error, 1)
+	defer close(errs)
+	fetchKeywords(errs)
+	var err = <-errs
+	if err != nil {
+		log.Fatal("error while fetching keywords:", err)
+	}
+}
 
 // Update is the exported struct that contains
 // all kind of info about the project.
@@ -57,48 +66,6 @@ func UseAppengine() {
 func SetMinPoints(points int) {
 	minPoints = points
 	log.Println("minPoints now is", minPoints)
-}
-
-// SetDatabase sets the database that will
-// be used.
-//
-// name is the storage engine that we'll use.
-// valid names are: rethinkdb.
-//
-// hosts is the host for the given engine.
-//
-// database is the database name where the keywords
-// are located.
-//
-// table is the table name where the keywords are
-// located. The table should have this structure:
-//
-// 	word   string
-// 	points int
-//
-func SetDatabase(name string, hosts []string, database string, table string, points int) (err error) {
-	var errs = make(chan error, 1)
-	defer close(errs)
-
-	lowerName := strings.ToLower(name)
-	switch lowerName {
-	case "rethinkdb":
-		rethink, err = configRethinkdb(hosts, database, table)
-		if err != nil {
-			return err
-		}
-		SetMinPoints(points)
-		fetchKeywords(errs)
-		err = <-errs
-		if err != nil {
-			return fmt.Errorf("error while fetching keywords: %s", err)
-		}
-		return nil
-	default:
-		err = fmt.Errorf("%s database is not supported", lowerName)
-		return err
-	}
-
 }
 
 // replaceSpaces replaces spaces of text with char if the text contains

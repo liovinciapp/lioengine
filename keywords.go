@@ -1,43 +1,36 @@
 package lioengine
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"math/rand"
-	"strconv"
 	"strings"
 	"sync"
-
-	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 // Keyword struct
 type Keyword struct {
-	ID     string `gorethink:"id"`
-	Word   string `gorethink:"word"`
-	Points int    `gorethink:"points"`
+	ID     int    `json:"id"`
+	Word   string `json:"word"`
+	Points int    `json:"points"`
 }
 
 // this is the function that will be called
 // on init() and will initialize the
 // keywords var.
 func fetchKeywords(errs chan error) {
-	if rethink != nil {
-		res, err := r.Table(rethink.table).Run(rethink.session)
-		if err != nil {
-			errs <- err
-			return
-		}
-		defer res.Close()
-
-		err = res.All(&keywords)
-		if err != nil {
-			errs <- err
-			return
-		}
-		errs <- nil
+	data, err := ioutil.ReadFile("keywords.json")
+	if err != nil {
+		errs <- err
 		return
 	}
+	err = json.Unmarshal(data, &keywords)
+	if err != nil {
+		errs <- err
+		return
+	}
+	log.Println("len of keywords:", len(keywords))
 	errs <- nil
 }
 
@@ -142,49 +135,44 @@ func GetKeyword(keyword string) *Keyword {
 	return nil
 }
 
+// GetKeywordByID returns a keyword by it's id
+func GetKeywordByID(id int) *Keyword {
+	for _, key := range keywords {
+		if key.ID == id {
+			return key
+		}
+	}
+	return nil
+}
+
+var lastID = 700
+
 // AddKeyword adds a keyword
 func AddKeyword(word string, points int) (*Keyword, error) {
 	if key := GetKeyword(word); key != nil {
 		return nil, fmt.Errorf("this keyword is already added")
 	}
-	if rethink != nil {
-		newKeyword := &Keyword{
-			ID:     strconv.FormatFloat(rand.Float64(), 'f', 50, 64),
-			Word:   word,
-			Points: points,
-		}
-
-		_, err := r.Table(rethink.table).Insert(newKeyword).RunWrite(rethink.session)
-		if err != nil {
-			return nil, err
-		}
-
-		keywords = append(keywords, newKeyword)
-		log.Println("added", word, ":", points)
-		return newKeyword, nil
+	newKeyword := &Keyword{
+		ID:     lastID,
+		Word:   word,
+		Points: points,
 	}
-	return nil, nil
+	keywords = append(keywords, newKeyword)
+	lastID++
+	return newKeyword, nil
 }
 
 // ModifyKeyword modifies the points for a keyword
-func ModifyKeyword(id string, points int) (*Keyword, error) {
-	if rethink != nil {
-		_, err := r.Table(rethink.table).Get(id).Update(map[string]interface{}{
-			"points": points,
-		}).RunWrite(rethink.session)
-		if err != nil {
-			return nil, err
-		}
+func ModifyKeyword(id int, points int) (*Keyword, error) {
 
-		var word string
-		for _, kw := range keywords {
-			if kw.ID == id {
-				kw.Points = points
-				word = kw.Word
-				log.Println("modified", word, ":", points)
-				return kw, nil
-			}
-		}
+	var word string
+	key := GetKeywordByID(id)
+	if key == nil {
+		return nil, fmt.Errorf("the keyword wasn't found")
 	}
-	return nil, nil
+	key.Points = points
+	word = key.Word
+	log.Println("modified", word, ":", points)
+	return key, nil
+
 }
