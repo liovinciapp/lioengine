@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"strings"
 	"sync"
 )
@@ -20,7 +21,13 @@ type Keyword struct {
 // on init() and will initialize the
 // keywords var.
 func fetchKeywords(errs chan error) {
-	data, err := ioutil.ReadFile("keywords.json")
+	resp, err := http.DefaultClient.Get("https://raw.githubusercontent.com/Shixzie/dataset-parser/master/keywords_with_random_points.json")
+	if err != nil {
+		errs <- err
+		return
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		errs <- err
 		return
