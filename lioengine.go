@@ -54,7 +54,7 @@ type Img struct {
 }
 
 // UseAppengine uses appengine requests
-func UseAppengine() {
+func useAppengine() {
 	usingAppengine = true
 }
 
