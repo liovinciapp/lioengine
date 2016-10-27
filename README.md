@@ -8,7 +8,6 @@ Bot should be ready for use.
 
 ## Goals
 1. Automate the multi-bot search proccess so users don't have to make it.
-2. Add support for more storage engines, such as mysql, postgresql, and mongo. 
 3. Some stuff that i can't remember right now.
 
 ## How it works
@@ -47,14 +46,6 @@ func main() {
 	bot1 := lioengine.NewBot()
 	bot2 := lioengine.NewBot()
 	bot3 := lioengine.NewBot()
-
-	lioengine.SetDatabase("rethinkdb",
-	 []string{
-		 "localhost", // the hosts
-	 },
-	 "test", 		  // database name
-	 "keywords", 	  // table name
-	)
 
 	lioengine.SetMinPoints(25) // The default is 15 <- this may change
 
