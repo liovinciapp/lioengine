@@ -120,8 +120,13 @@ func filterUpdates(updates *[]*Update) (newUpdates []*Update) {
 	return
 }
 
-// GetKeywordsNumber returns the lenght of keywords
-func GetKeywordsNumber() int {
+// GetKeywords returns all current keywords
+func GetKeywords() []*Keyword {
+	return keywords
+}
+
+// GetKeywordsCount returns the lenght of keywords
+func GetKeywordsCount() int {
 	return len(keywords)
 }
 
