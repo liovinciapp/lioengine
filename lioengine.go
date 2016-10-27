@@ -7,7 +7,7 @@ import (
 )
 
 // sets if using appengine
-var appengine bool
+var usingAppengine bool
 
 // supportedProviders contains all the providers supported by this bot.
 var supportedProviders = []string{"Bing", "Twitter"}
@@ -55,7 +55,7 @@ type Img struct {
 
 // UseAppengine uses appengine requests
 func UseAppengine() {
-	appengine = true
+	usingAppengine = true
 }
 
 // SetMinPoints sets the minimum points
