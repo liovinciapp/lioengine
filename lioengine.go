@@ -65,7 +65,6 @@ func UseAppengine() {
 // And the lower the easier to get more updates.
 func SetMinPoints(points int) {
 	minPoints = points
-	log.Println("minPoints now is", minPoints)
 }
 
 // replaceSpaces replaces spaces of text with char if the text contains
