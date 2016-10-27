@@ -87,7 +87,7 @@ func (t *twitterProv) standarize(updates *[]*Update, wg *sync.WaitGroup) {
 		newUpdate.Description = tweet.Text
 		newUpdate.Link = tweet.Source
 		newUpdate.DatePublished = tweet.CreatedAt
-		newUpdate.Img = new(Img)
+		newUpdate.Img = nil
 		newUpdate.Category = ""
 		newUpdate.Sources = []string{tweet.User.Name}
 		*updates = append(*updates, newUpdate)
