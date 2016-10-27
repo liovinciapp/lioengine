@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"sync"
 
+	"google.golang.org/appengine"
+
 	"github.com/dghubble/go-twitter/twitter"
 	"golang.org/x/oauth2"
 )
@@ -39,8 +41,20 @@ func (t *twitterProv) newProvider(apiToken string, count int) (err error) {
 	token.AccessToken = t.Token
 
 	// http.Client will automatically authorize Requests
-	httpClient := config.Client(oauth2.NoContext, token)
-	t.Client = twitter.NewClient(httpClient)
+	if usingAppengine {
+		req, err := http.NewRequest("GET", "https://api.twitter.com/1.1/", nil)
+		if err != nil {
+			return err
+		}
+		context := appengine.NewContext(req)
+		// httpClient := config.Client(context, token)
+		httpClient := config.Client(context, token)
+		t.Client = twitter.NewClient(httpClient)
+	} else {
+		// httpClient := config.Client(context, token)
+		httpClient := config.Client(oauth2.NoContext, token)
+		t.Client = twitter.NewClient(httpClient)
+	}
 
 	return
 }
