@@ -102,17 +102,17 @@ func (l *Listener) GetReadItems() []*rss.Item { return l.readItems }
 // GetUnreadItems returns the unread items
 func (l *Listener) GetUnreadItems() []*rss.Item { return l.unreadItems }
 
-// GetItem returns an item by it's name and ID
-func (l *Listener) GetItem(title string, ID string, read bool) (*rss.Item, error) {
+// GetItem returns an item by it's ID
+func (l *Listener) GetItem(ID string, read bool) (*rss.Item, error) {
 	if read {
 		for _, i := range l.readItems {
-			if i.Title == title && i.ID == ID {
+			if i.ID == ID {
 				return i, nil
 			}
 		}
 	} else {
 		for _, i := range l.unreadItems {
-			if i.Title == title && i.ID == ID {
+			if i.ID == ID {
 				return i, nil
 			}
 		}
