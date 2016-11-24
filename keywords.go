@@ -69,14 +69,14 @@ func splitWords(updates *[]*Update) {
 
 func calculatePoints(updates *[]*Update, projectName string) {
 	var wg sync.WaitGroup
+	wg.Add(len(*updates))
 	for _, update := range *updates { // Iterate through all updates
-		wg.Add(1)
 		go func(waitg *sync.WaitGroup, updt *Update) { // Make it go faster
 			defer waitg.Done() // Notice our progress senpai
 			var points int     // How many we have
 			var repeatedWords []string
+		WORD: // Label so the O(n3) is not that bad...
 			for _, word := range updt.words {
-			WORD: // Label so the O(n3) is not that bad...
 				for _, keyword := range keywords {
 					if word == keyword.Word || word == projectName { // Check if matches
 						if !isARepeatedWord(word, &repeatedWords) { // WARN: O(n3) HERE <--------------------
