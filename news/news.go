@@ -102,6 +102,24 @@ func (l *Listener) GetReadItems() []*rss.Item { return l.readItems }
 // GetUnreadItems returns the unread items
 func (l *Listener) GetUnreadItems() []*rss.Item { return l.unreadItems }
 
+// GetItem returns an item by it's name and ID
+func (l *Listener) GetItem(title string, ID string, read bool) (*rss.Item, error) {
+	if read {
+		for _, i := range l.readItems {
+			if i.Title == title && i.ID == ID {
+				return i, nil
+			}
+		}
+	} else {
+		for _, i := range l.unreadItems {
+			if i.Title == title && i.ID == ID {
+				return i, nil
+			}
+		}
+	}
+	return nil, errors.New("item not found")
+}
+
 // deleteOldReadItems deletes all read items that are 10 days older
 // or more
 func (l *Listener) deleteOldReadItems() {
