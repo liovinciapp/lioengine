@@ -93,6 +93,12 @@ func (l *Listener) addItem(item *rss.Item) {
 		}
 		exists = i.ID == item.ID && i.Title == item.Title && i.Link == item.Link
 	}
+	for _, i := range l.readItems {
+		if exists {
+			return
+		}
+		exists = i.ID == item.ID && i.Title == item.Title && i.Link == item.Link
+	}
 	l.unreadItems = append(l.unreadItems, item)
 }
 
