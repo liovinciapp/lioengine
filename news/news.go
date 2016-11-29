@@ -99,8 +99,8 @@ func (l *Listener) addItem(item *rss.Item) {
 		}
 		exists = i.ID == item.ID && i.Title == item.Title && i.Link == item.Link
 	}
-	iTime := item.Date
-	if !time.Now().After(iTime.Add(time.Hour * 240)) {
+
+	if !time.Now().Add(time.Hour * 240).After(item.Date) {
 		l.unreadItems = append(l.unreadItems, item)
 	}
 }
